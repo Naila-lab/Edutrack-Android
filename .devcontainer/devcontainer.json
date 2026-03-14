@@ -1,0 +1,30 @@
+{
+  "name": "EduTrack Android Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "jdkDistribution": "ms"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "mathiasfrohlich.Kotlin",
+        "fwcd.kotlin",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "editor.fontSize": 14,
+        "editor.tabSize": 4,
+        "editor.formatOnSave": true,
+        "files.autoSave": "afterDelay"
+      }
+    }
+  },  
+  "postCreateCommand": "echo EduTrack Codespace siap!",
+  "remoteUser": "vscode"
+}
+
+
+
