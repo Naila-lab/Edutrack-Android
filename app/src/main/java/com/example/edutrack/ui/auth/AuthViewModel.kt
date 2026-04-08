@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.edutrack.data.repository.AuthRepository
 import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 sealed class AuthState {
     object Idle : AuthState()
@@ -15,8 +17,8 @@ sealed class AuthState {
 }
 
 class AuthViewModel : ViewModel() {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val repository = AuthRepository()
-
     private val _authState = MutableLiveData<AuthState>(AuthState.Idle)
     val authState: LiveData<AuthState> = _authState
 
@@ -59,7 +61,18 @@ class AuthViewModel : ViewModel() {
             }
         }
     }
-
+    fun loginWithGoogle(idToken: String) {
+        _authState.value = AuthState.Loading
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    _authState.value = AuthState.Success
+                } else {
+                    _authState.value = AuthState.Error(task.exception?.message ?: "Login Gagal")
+                }
+            }
+    }
     fun resetPassword(email: String) {
         if (email.isEmpty()) {
             _authState.value = AuthState.Error("Email tidak boleh kosong")
