@@ -1,4 +1,4 @@
-package com.example.edutrack.ui.dashboard // Sesuaikan package-mu!
+package com.example.edutrack.ui.dashboard
 
 import android.graphics.Typeface
 import android.os.Bundle
@@ -25,6 +25,9 @@ import java.util.Calendar
 import android.app.AlertDialog
 import android.widget.EditText
 import java.util.*
+import android.content.Intent
+import android.widget.Toast
+import com.example.edutrack.ui.pomodoro.PomodoroTimerActivity
 
 class DashboardFragment : Fragment() {
 
@@ -60,6 +63,16 @@ class DashboardFragment : Fragment() {
 
         streakManager.markTodayAsStudied()
         updateStreakUI()
+
+        binding.btnGoPomodoro.setOnClickListener {
+            try {
+                val intent = Intent(requireContext(), PomodoroTimerActivity::class.java)
+                startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Toast.makeText(requireContext(), "Gagal membuka halaman Pomodoro: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupTodoDatabase() {
@@ -88,7 +101,7 @@ class DashboardFragment : Fragment() {
             val priority = when (selectedId) {
                 R.id.rbLow -> "Low"
                 R.id.rbHigh -> "High"
-                else -> "Medium" // Default ke Medium jika ragu
+                else -> "Medium"
             }
 
             // 2. Validasi: Pastikan user mengisi teks dan memilih tanggal
@@ -96,8 +109,8 @@ class DashboardFragment : Fragment() {
                 val newTask = Task(
                     title = text,
                     subject = "Umum",
-                    priority = priority, // Menggunakan prioritas yang dipilih
-                    deadline = selectedDeadline!! // Pakai force-unwrap karena sudah dicek null
+                    priority = priority,
+                    deadline = selectedDeadline!!
                 )
                 taskViewModel.insert(newTask)
 

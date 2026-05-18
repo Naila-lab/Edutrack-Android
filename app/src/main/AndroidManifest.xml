@@ -5,6 +5,8 @@
     <!-- Permission untuk Firebase dan internet -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EduTrack">
+
+        <activity
+            android:name=".ui.pomodoro.PomodoroTimerActivity"
+            android:exported="false"/>
 
         <activity
             android:name=".MainActivity"

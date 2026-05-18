@@ -41,4 +41,35 @@
     <!-- Transparent -->
     <color name="transparent">#00000000</color>
     <color name="overlay">#99000000</color>
+
+    <!-- Background -->
+    <color name="bgLight">#F5F6FA</color>
+    <color name="bgCard">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="textPrimary">#111827</color>
+    <color name="textSecondary">#6B7280</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Pomodoro modes -->
+    <color name="pomodoroFocus">#FF8C42</color>
+    <color name="pomodoroFocusDark">#E8722E</color>
+    <color name="pomodoroShortBreak">#64B5F6</color>
+    <color name="pomodoroLongBreak">#81C784</color>
+
+
+    <!-- Flashcard gradients -->
+    <color name="cardGreenStart">#22C55E</color>
+    <color name="cardGreenEnd">#16A34A</color>
+    <color name="cardBlueStart">#3B82F6</color>
+    <color name="cardBlueEnd">#1D4ED8</color>
+    <color name="cardPurpleStart">#8B5CF6</color>
+    <color name="cardPurpleEnd">#6D28D9</color>
+    <color name="cardOrangeStart">#F59E0B</color>
+    <color name="cardOrangeEnd">#D97706</color>
+
+    <!-- Accent -->
+    <color name="accentBlue">#3B82F6</color>
+
+
 </resources>
