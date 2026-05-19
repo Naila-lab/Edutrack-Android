@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.edutrack"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.edutrack"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -63,6 +63,7 @@ dependencies {
     // ViewModel & LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
+    implementation(libs.androidx.activity)
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
@@ -76,5 +77,10 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.espresso:espresso-core:3.6.1")
+
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation("androidx.activity:activity:1.9.3")
+    implementation("androidx.activity:activity-ktx:1.9.3")
 
 }

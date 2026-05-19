@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="20dp">
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Topik" android:textSize="13sp"
+            android:textColor="@color/textSecondary" android:layout_marginBottom="6dp" />
+
+        <EditText android:id="@+id/etTopik"
+            android:layout_width="match_parent" android:layout_height="52dp"
+            android:background="@drawable/bg_spinner" android:paddingHorizontal="16dp"
+            android:hint="Contoh: RPL, Matematika..."
+            android:inputType="text" android:textSize="14sp"
+            android:textColor="@color/textPrimary" android:textColorHint="@color/textSecondary"
+            android:layout_marginBottom="16dp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Pertanyaan" android:textSize="13sp"
+            android:textColor="@color/textSecondary" android:layout_marginBottom="6dp" />
+
+        <EditText android:id="@+id/etQuestion"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="80dp" android:gravity="top"
+            android:background="@drawable/bg_spinner" android:padding="12dp"
+            android:hint="Tulis pertanyaan..." android:inputType="textMultiLine"
+            android:textSize="14sp" android:textColor="@color/textPrimary"
+            android:layout_marginBottom="16dp" />
+
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Jawaban" android:textSize="13sp"
+            android:textColor="@color/textSecondary" android:layout_marginBottom="6dp" />
+
+        <EditText android:id="@+id/etAnswer"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="80dp" android:gravity="top"
+            android:background="@drawable/bg_spinner" android:padding="12dp"
+            android:hint="Tulis jawaban..." android:inputType="textMultiLine"
+            android:textSize="14sp" android:textColor="@color/textPrimary"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Color circles - no label, fully round -->
+        <RadioGroup android:id="@+id/rgColor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
+
+            <RadioButton android:id="@+id/rbGreen"
+                android:layout_width="40dp" android:layout_height="40dp"
+                android:button="@null"
+                android:background="@drawable/rb_green_circle"
+                android:checked="true"
+                android:layout_marginEnd="12dp" />
+
+            <RadioButton android:id="@+id/rbBlue"
+                android:layout_width="40dp" android:layout_height="40dp"
+                android:button="@null"
+                android:background="@drawable/rb_blue_circle"
+                android:layout_marginEnd="12dp" />
+
+            <RadioButton android:id="@+id/rbPurple"
+                android:layout_width="40dp" android:layout_height="40dp"
+                android:button="@null"
+                android:background="@drawable/rb_purple_circle"
+                android:layout_marginEnd="12dp" />
+
+            <RadioButton android:id="@+id/rbOrange"
+                android:layout_width="40dp" android:layout_height="40dp"
+                android:button="@null"
+                android:background="@drawable/rb_orange_circle" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+</ScrollView>

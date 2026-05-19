@@ -28,6 +28,7 @@ import java.util.*
 import android.content.Intent
 import android.widget.Toast
 import com.example.edutrack.ui.pomodoro.PomodoroTimerActivity
+import com.example.edutrack.ui.flashcard.FlashcardActivity
 
 class DashboardFragment : Fragment() {
 
@@ -63,6 +64,15 @@ class DashboardFragment : Fragment() {
 
         streakManager.markTodayAsStudied()
         updateStreakUI()
+
+        binding.btnGoFlashcard.setOnClickListener {
+            try {
+                val intent = Intent(requireContext(), FlashcardActivity::class.java)
+                startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
 
         binding.btnGoPomodoro.setOnClickListener {
             try {
