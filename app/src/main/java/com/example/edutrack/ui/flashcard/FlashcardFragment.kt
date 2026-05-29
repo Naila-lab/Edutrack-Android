@@ -2,8 +2,15 @@ package com.example.edutrack.ui.flashcard
 
 import android.content.Context
 import android.os.Bundle
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.RadioGroup
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -30,7 +37,7 @@ data class Flashcard(
 class FlashcardFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var fabCreate: Button          // ← fix: Button biasa
+    private lateinit var fabCreate: Button
     private lateinit var chipGroup: ChipGroup
     private lateinit var tvEmpty: TextView
 
@@ -283,6 +290,6 @@ class FlashcardAdapter2(
                 flippedSet.remove(card.id)
             }
             tvHint.text = if (!isFlipped) "KETUK UNTUK SOAL" else "KETUK UNTUK JAWABAN"
-        }
-    }
-}
+        } // Penutup fungsi flipCard
+    } // Penutup inner class CardVH
+} // Penutup class FlashcardAdapter2

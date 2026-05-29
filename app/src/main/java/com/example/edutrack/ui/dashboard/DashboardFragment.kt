@@ -309,9 +309,18 @@ class DashboardFragment : Fragment() {
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
-
     private fun setupQuickActions() {
-        binding.btnGoSchedule.setOnClickListener { }
+        // 1. ISI TOMBOL JADWAL DI SINI:
+        binding.btnGoSchedule.setOnClickListener {
+            try {
+                // Menggunakan ID yang sinkron dengan XML
+                androidx.navigation.fragment.NavHostFragment.findNavController(this)
+                    .navigate(com.example.edutrack.R.id.jadwalFragment)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                android.widget.Toast.makeText(requireContext(), "Navigasi Jadwal Gagal: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+            }
+    }
         binding.btnGoPomodoro.setOnClickListener { }
         binding.btnGoFlashcard.setOnClickListener { }
     }

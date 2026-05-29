@@ -71,5 +71,10 @@
     <!-- Accent -->
     <color name="accentBlue">#3B82F6</color>
 
+    <color name="brand_purple">#6C63FF</color>
+    <color name="brand_blue">#3F51B5</color>
+    <color name="brand_dark_purple">#4A148C</color>
+    <color name="light_bg">#F5F6FA</color>
 
 </resources>
+

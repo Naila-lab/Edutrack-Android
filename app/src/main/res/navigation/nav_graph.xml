@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
@@ -34,12 +35,21 @@
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.example.edutrack.ui.dashboard.DashboardFragment"
-        android:label="Dashboard">
+        android:label="Dashboard" >
         <action
             android:id="@+id/action_dashboardFragment_to_loginFragment"
             app:destination="@id/loginFragment"
             app:popUpTo="@id/dashboardFragment"
-            app:popUpToInclusive="true"/>
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_dashboardFragment_to_jadwalFragment"
+            app:destination="@id/jadwalFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/jadwalFragment"
+        android:name="com.example.edutrack.ui.jadwal.JadwalFragment"
+        android:label="fragment_jadwal"
+        tools:layout="@layout/fragment_jadwal" />
 
 </navigation>
