@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://tools.android.com/tools"
     android:background="@color/bgLight"
     android:fillViewport="true">
 
@@ -12,13 +13,24 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- ── Header ─────────────────────────────────────── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_marginBottom="24dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_back_arrow"
+                android:contentDescription="Kembali"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:tint="@color/textPrimary"
+                android:layout_marginEnd="4dp"/>
 
             <ImageView
                 android:layout_width="26dp"
@@ -46,7 +58,6 @@
                 android:contentDescription="Edit Durasi" />
         </LinearLayout>
 
-        <!-- ── Input Materi ───────────────────────────────── -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -68,7 +79,6 @@
             android:textColorHint="@color/textSecondary"
             android:layout_marginBottom="28dp" />
 
-        <!-- ── Timer Card ──────────────────────────────────── -->
         <FrameLayout
             android:id="@+id/containerTimer"
             android:layout_width="match_parent"
@@ -86,7 +96,6 @@
                 android:orientation="vertical"
                 android:gravity="center">
 
-                <!-- Mode label -->
                 <TextView
                     android:id="@+id/tvMode"
                     android:layout_width="wrap_content"
@@ -98,13 +107,11 @@
                     android:textColor="#DDFFFFFF"
                     android:layout_marginBottom="20dp" />
 
-                <!-- Arc + Digits -->
                 <FrameLayout
                     android:layout_width="210dp"
                     android:layout_height="210dp"
                     android:layout_gravity="center_horizontal">
 
-                    <!-- Custom arc view -->
                     <ProgressBar
                         android:id="@+id/arcProgress"
                         android:layout_width="210dp"
@@ -115,7 +122,6 @@
                         android:max="100"
                         android:progress="75" />
 
-                    <!-- Timer digit di tengah -->
                     <TextView
                         android:id="@+id/tvTimerDisplay"
                         android:layout_width="wrap_content"
@@ -127,7 +133,6 @@
                         android:textColor="@color/white"
                         android:includeFontPadding="false" />
 
-                    <!-- Hidden views kept for Activity compat -->
                     <TextView
                         android:id="@+id/tvMinutes"
                         android:layout_width="0dp"
@@ -141,7 +146,6 @@
 
                 </FrameLayout>
 
-                <!-- Controls -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -180,7 +184,6 @@
             </LinearLayout>
         </FrameLayout>
 
-        <!-- ── Stats ──────────────────────────────────────── -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

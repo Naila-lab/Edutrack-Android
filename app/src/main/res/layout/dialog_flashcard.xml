@@ -1,70 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="24dp"
+    android:background="@android:color/white">
 
-    <EditText
-        android:id="@+id/etTopik"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Topik Flashcard (cth: RPL)"
-        android:layout_marginBottom="12dp"/>
+        android:text="Buat Flashcard Baru"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginBottom="20dp"/>
 
-    <EditText
-        android:id="@+id/etQuestion"
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Pertanyaan"
-        android:layout_marginBottom="12dp"/>
-
+        android:text="Topik Flashcard"
+        android:textSize="12sp"
+        android:textColor="?attr/colorPrimary"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
     <EditText
-        android:id="@+id/etAnswer"
+        android:id="@+id/etTopikFlashcard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Jawaban"
+        android:hint="Contoh: RPL, STI, Python"
+        android:inputType="text"
+        android:textSize="15sp"
         android:layout_marginBottom="16dp"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pilih Warna Kartu:"
+        android:text="Pertanyaan"
+        android:textSize="12sp"
+        android:textColor="?attr/colorPrimary"
         android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
+    <EditText
+        android:id="@+id/etPertanyaan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Masukkan pertanyaan kartu"
+        android:inputType="textLongMessage"
+        android:textSize="15sp"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Jawaban"
+        android:textSize="12sp"
+        android:textColor="?attr/colorPrimary"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp"/>
+    <EditText
+        android:id="@+id/etJawaban"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Masukkan jawaban kartu"
+        android:inputType="textLongMessage"
+        android:textSize="15sp"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pilih Warna Kartu"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
         android:layout_marginBottom="8dp"/>
 
     <RadioGroup
-        android:id="@+id/rgColor"
+        android:id="@+id/rgWarnaKartu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
 
         <RadioButton
-            android:id="@+id/rbGreen"
-            android:layout_width="wrap_content"
+            android:id="@+id/rbHijau"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Hijau"
-            android:layout_weight="1"/>
+            android:textSize="14sp"
+            android:paddingStart="8dp"/>
 
         <RadioButton
-            android:id="@+id/rbBlue"
-            android:layout_width="wrap_content"
+            android:id="@+id/rbBiru"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Biru"
-            android:layout_weight="1"/>
+            android:textSize="14sp"
+            android:paddingStart="8dp"/>
 
         <RadioButton
-            android:id="@+id/rbPurple"
-            android:layout_width="wrap_content"
+            android:id="@+id/rbUngu"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Ungu"
-            android:layout_weight="1"/>
+            android:textSize="14sp"
+            android:paddingStart="8dp"/>
 
         <RadioButton
-            android:id="@+id/rbOrange"
-            android:layout_width="wrap_content"
+            android:id="@+id/rbOranye"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Oranye"
-            android:layout_weight="1"/>
+            android:textSize="14sp"
+            android:paddingStart="8dp"/>
     </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBatalFlashcard"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BATAL"
+            android:textColor="#757575"
+            android:layout_marginEnd="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSimpanFlashcard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SIMPAN"
+            app:backgroundTint="?attr/colorPrimary"/>
+    </LinearLayout>
+
 </LinearLayout>

@@ -23,6 +23,9 @@ import com.google.gson.reflect.TypeToken
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import com.example.edutrack.R
+import android.view.Window
+import android.app.Dialog
+import android.view.WindowManager
 
 // ── Data model ────────────────────────────────────────────────────────────────
 data class Flashcard(
@@ -55,6 +58,12 @@ class FlashcardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 🌟 DI SINI: Inisialisasi dan Logika Klik Tombol Back Flashcard 🌟
+        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
+        btnBack.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
 
         recyclerView = view.findViewById(R.id.recyclerFlashcards)
         fabCreate    = view.findViewById(R.id.fabCreate)
@@ -112,48 +121,81 @@ class FlashcardFragment : Fragment() {
     }
 
     // ── CRUD ──────────────────────────────────────────────────────────────────
+    // ── REVISI MUTLAK: OPTIMASI DIALOG FLASHCARD AGAR LEBAR & TIDAK BENTROK ──
     private fun showCardDialog(existing: Flashcard?) {
-        val dv      = layoutInflater.inflate(R.layout.dialog_flashcard, null)
-        val etQ     = dv.findViewById<EditText>(R.id.etQuestion)
-        val etA     = dv.findViewById<EditText>(R.id.etAnswer)
-        val etTopik = dv.findViewById<EditText>(R.id.etTopik)
-        val rgColor = dv.findViewById<RadioGroup>(R.id.rgColor)
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(true)
+
+        val dv = layoutInflater.inflate(R.layout.dialog_flashcard, null)
+        dialog.setContentView(dv)
+
+        val etQ     = dv.findViewById<EditText>(R.id.etPertanyaan)
+        val etA     = dv.findViewById<EditText>(R.id.etJawaban)
+        val etTopik = dv.findViewById<EditText>(R.id.etTopikFlashcard)
+        val rgColor = dv.findViewById<RadioGroup>(R.id.rgWarnaKartu)
+
+        val btnBatal  = dv.findViewById<Button>(R.id.btnBatalFlashcard)
+        val btnSimpan = dv.findViewById<Button>(R.id.btnSimpanFlashcard)
 
         existing?.let {
             etQ.setText(it.question)
             etA.setText(it.answer)
             etTopik.setText(it.topik)
             val rb = when (it.colorIndex) {
-                1 -> R.id.rbBlue; 2 -> R.id.rbPurple; 3 -> R.id.rbOrange; else -> R.id.rbGreen
+                1 -> R.id.rbBiru
+                2 -> R.id.rbUngu
+                3 -> R.id.rbOranye
+                else -> R.id.rbHijau
             }
             rgColor.check(rb)
         }
 
-        AlertDialog.Builder(requireContext(), R.style.StudyApp_Dialog)
-            .setTitle(if (existing == null) "Buat Flashcard Baru" else "Edit Flashcard")
-            .setView(dv)
-            .setPositiveButton("Simpan") { _, _ ->
-                val q = etQ.text.toString().trim()
-                val a = etA.text.toString().trim()
-                val t = etTopik.text.toString().trim().ifEmpty { "Umum" }
-                val c = when (rgColor.checkedRadioButtonId) {
-                    R.id.rbBlue -> 1; R.id.rbPurple -> 2; R.id.rbOrange -> 3; else -> 0
-                }
-                if (q.isEmpty() || a.isEmpty()) {
-                    Toast.makeText(requireContext(), "Pertanyaan & jawaban tidak boleh kosong", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-                if (existing == null) {
-                    allCards.add(0, Flashcard(topik = t, question = q, answer = a, colorIndex = c))
-                } else {
-                    existing.topik = t; existing.question = q
-                    existing.answer = a; existing.colorIndex = c
-                }
-                saveCards()
-                rebuildFilterChips()
-                applyFilter()
+        btnBatal.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnSimpan.setOnClickListener {
+            val q = etQ.text.toString().trim()
+            val a = etA.text.toString().trim()
+            val t = etTopik.text.toString().trim().ifEmpty { "Umum" }
+
+            val c = when (rgColor.checkedRadioButtonId) {
+                R.id.rbBiru -> 1
+                R.id.rbUngu -> 2
+                R.id.rbOranye -> 3
+                else -> 0
             }
-            .setNegativeButton("Batal", null).show()
+
+            if (q.isEmpty() || a.isEmpty()) {
+                Toast.makeText(requireContext(), "Pertanyaan & jawaban tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (existing == null) {
+                allCards.add(0, Flashcard(topik = t, question = q, answer = a, colorIndex = c))
+            } else {
+                existing.topik = t
+                existing.question = q
+                existing.answer = a
+                existing.colorIndex = c
+            }
+
+            saveCards()
+            rebuildFilterChips()
+            applyFilter()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+
+        val window = dialog.window
+        if (window != null) {
+            val layoutParams = window.attributes
+            layoutParams.width = (resources.displayMetrics.widthPixels * 0.92).toInt()
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+            window.attributes = layoutParams
+        }
     }
 
     private fun deleteCard(card: Flashcard) {
@@ -290,6 +332,6 @@ class FlashcardAdapter2(
                 flippedSet.remove(card.id)
             }
             tvHint.text = if (!isFlipped) "KETUK UNTUK SOAL" else "KETUK UNTUK JAWABAN"
-        } // Penutup fungsi flipCard
-    } // Penutup inner class CardVH
-} // Penutup class FlashcardAdapter2
+        }
+    }
+}

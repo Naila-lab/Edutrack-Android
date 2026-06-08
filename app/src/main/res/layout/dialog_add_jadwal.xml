@@ -24,20 +24,37 @@
         android:layout_marginBottom="12dp"/>
 
     <EditText
-        android:id="@+id/et_jam_mulai"
+        android:id="@+id/et_tanggal_belajar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Jam Mulai (Contoh: 09:00)"
-        android:inputType="time"
+        android:hint="Tanggal Belajar (Contoh: 2026-06-08)"
+        android:inputType="date"
         android:layout_marginBottom="12dp"/>
 
-    <EditText
-        android:id="@+id/et_jam_selesai"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Jam Selesai (Contoh: 11:30)"
-        android:inputType="time"
-        android:layout_marginBottom="12dp"/>
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <EditText
+            android:id="@+id/et_jam_mulai"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Jam Mulai (09:00)"
+            android:inputType="time"
+            android:layout_marginEnd="8dp"/>
+
+        <EditText
+            android:id="@+id/et_jam_selesai"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Jam Selesai (11:30)"
+            android:inputType="time"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
 
     <EditText
         android:id="@+id/et_keterangan"
@@ -52,6 +69,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="SIMPAN JADWAL"
-        android:backgroundTint="#6200EE"
+        android:backgroundTint="#2563EB"
         android:textColor="@android:color/white"/>
 </LinearLayout>

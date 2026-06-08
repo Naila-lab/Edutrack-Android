@@ -24,6 +24,9 @@ import androidx.core.content.ContextCompat
 import kotlin.math.ceil
 import com.example.edutrack.R
 import android.widget.ProgressBar
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class PomodoroTimerActivity : AppCompatActivity() {
 
@@ -36,10 +39,12 @@ class PomodoroTimerActivity : AppCompatActivity() {
     private lateinit var btnReset: ImageButton
     private lateinit var btnSkip: ImageButton
     private lateinit var btnEditDuration: ImageButton
-    private lateinit var arcProgress: ProgressBar  // ← custom arc
+    private lateinit var arcProgress: ProgressBar
     private lateinit var tvPomodoroDone: TextView
     private lateinit var tvTotalFocus: TextView
     private lateinit var containerTimer: View
+
+    private lateinit var btnBack: ImageButton
 
     enum class TimerMode { FOCUS, BREAK }
 
@@ -72,6 +77,7 @@ class PomodoroTimerActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
+        btnBack         = findViewById(R.id.btnBack)
         tvTimerDisplay  = findViewById(R.id.tvTimerDisplay)
         tvMinutes       = findViewById(R.id.tvMinutes)
         tvSeconds       = findViewById(R.id.tvSeconds)
@@ -88,12 +94,29 @@ class PomodoroTimerActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        btnBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
         btnStartPause.setOnClickListener {
             if (isRunning) pauseTimer() else startTimer()
         }
         btnReset.setOnClickListener        { resetTimer()             }
         btnSkip.setOnClickListener         { skipToNext()             }
         btnEditDuration.setOnClickListener { showEditDurationDialog() }
+    }
+
+    // ── 🌟 INTEGRASI PERSISTENSI: KONTROL LIFECYCLE ONRESUME ──
+    override fun onResume() {
+        super.onResume()
+        restoreTimerState()
+    }
+
+    // ── 🌟 INTEGRASI PERSISTENSI: KONTROL LIFECYCLE ONPAUSE ──
+    override fun onPause() {
+        super.onPause()
+        saveTimerState()
+        countDownTimer?.cancel() // Amankan instance timer agar tidak memicu kebocoran memori RAM
     }
 
     private fun startTimer() {
@@ -127,6 +150,10 @@ class PomodoroTimerActivity : AppCompatActivity() {
 
     private fun resetTimer() {
         pauseTimer()
+        // Bersihkan juga sisa jejak data di cache lokal SharedPreferences
+        val sharedPrefs = getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+        sharedPrefs.edit().remove("pomo_is_running").remove("pomo_time_left").apply()
+
         timeLeftMs = totalDurationMs
         updateDisplay()
         arcProgress.progress = 100
@@ -144,6 +171,10 @@ class PomodoroTimerActivity : AppCompatActivity() {
         triggerFinishAnimation()
         vibrate()
         playSound()
+
+        // Hapus status penyimpanan sementara karena sesi sudah tuntas berakhir
+        val sharedPrefs = getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+        sharedPrefs.edit().remove("pomo_is_running").apply()
 
         if (currentMode == TimerMode.FOCUS) {
             pomodorosDone++
@@ -184,8 +215,9 @@ class PomodoroTimerActivity : AppCompatActivity() {
         val totalSecs = ceil(timeLeftMs / 1000.0).toLong()
         tvTimerDisplay.text = String.format("%02d:%02d", totalSecs / 60, totalSecs % 60)
 
-        // Update custom arc (0f = kosong, 1f = penuh)
-        arcProgress.progress = ((timeLeftMs.toFloat() / totalDurationMs.toFloat()) * 100).toInt()
+        arcProgress.progress = if (totalDurationMs > 0) {
+            ((timeLeftMs.toFloat() / totalDurationMs.toFloat()) * 100).toInt()
+        } else 100
 
         tvMode.text = when (currentMode) {
             TimerMode.FOCUS -> "Fokus"
@@ -206,6 +238,83 @@ class PomodoroTimerActivity : AppCompatActivity() {
         val mins = totalFocusSeconds / 60
         val secs = totalFocusSeconds % 60
         tvTotalFocus.text   = "Total fokus: ${mins}m ${secs}s"
+
+        val sdfTanggal = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val tanggalHariIni = sdfTanggal.format(Date())
+        val totalMenitBelajar = totalFocusSeconds.toFloat() / 60f
+
+        val sharedPrefs = getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+        sharedPrefs.edit().putFloat("pomodoro_time_$tanggalHariIni", totalMenitBelajar).apply()
+    }
+
+    // ── 🌟 JURUS SAKTI: AMANKAN STATE KETIKA USER MENINGGALKAN HALAMAN ──
+    private fun saveTimerState() {
+        val sharedPrefs = getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+        sharedPrefs.edit().apply {
+            putBoolean("pomo_is_running", isRunning)
+            putLong("pomo_time_left", timeLeftMs)
+            putLong("pomo_exit_time", System.currentTimeMillis())
+            putInt("pomo_total_focus_seconds", totalFocusSeconds)
+            putInt("pomo_done_sessions", pomodorosDone)
+            putString("pomo_current_mode", currentMode.name)
+            putInt("pomo_focus_minutes_setting", focusMinutes)
+            putInt("pomo_break_minutes_setting", breakMinutes)
+            putLong("pomo_total_duration", totalDurationMs)
+            apply()
+        }
+    }
+
+    // ── 🌟 JURUS SAKTI: HITUNG SELISIH WAKTU GHAIB DAN RESTORE SECARA AKURAT ──
+    private fun restoreTimerState() {
+        val sharedPrefs = getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+
+        // Jika tidak ada data tersimpan sebelumnya, abaikan pemulihan state
+        if (!sharedPrefs.contains("pomo_time_left")) return
+
+        val wasRunning = sharedPrefs.getBoolean("pomo_is_running", false)
+        val savedTimeLeft = sharedPrefs.getLong("pomo_time_left", focusMinutes * 60 * 1000L)
+        val exitTime = sharedPrefs.getLong("pomo_exit_time", 0L)
+
+        totalFocusSeconds = sharedPrefs.getInt("pomo_total_focus_seconds", 0)
+        pomodorosDone = sharedPrefs.getInt("pomo_done_sessions", 0)
+        focusMinutes = sharedPrefs.getInt("pomo_focus_minutes_setting", 25)
+        breakMinutes = sharedPrefs.getInt("pomo_break_minutes_setting", 5)
+        totalDurationMs = sharedPrefs.getLong("pomo_total_duration", focusMinutes * 60 * 1000L)
+
+        val savedModeStr = sharedPrefs.getString("pomo_current_mode", TimerMode.FOCUS.name)
+        currentMode = TimerMode.valueOf(savedModeStr ?: TimerMode.FOCUS.name)
+
+        updateModeColor()
+        tvPomodoroDone.text = "× $pomodorosDone sesi"
+
+        if (wasRunning && exitTime > 0L) {
+            val timePassedMs = System.currentTimeMillis() - exitTime
+            val newTimeLeft = savedTimeLeft - timePassedMs
+
+            if (currentMode == TimerMode.FOCUS) {
+                // Tambahkan akumulasi detik fokus yang berjalan di background secara matematis
+                val secondsPassed = (timePassedMs / 1000).toInt()
+                totalFocusSeconds += secondsPassed
+            }
+
+            if (newTimeLeft > 0) {
+                timeLeftMs = newTimeLeft
+                updateDisplay()
+                updateStats()
+                startTimer() // Lanjutkan jalannya hitung mundur otomatis
+            } else {
+                // Jika waktu habis saat ditinggalkan, tuntaskan sesi secara bersih
+                timeLeftMs = 0
+                updateDisplay()
+                onTimerFinished()
+            }
+        } else {
+            // Skenario jika posisi keluar dalam keadaan di-pause, kembalikan ke sisa waktu terakhir
+            timeLeftMs = savedTimeLeft
+            updateDisplay()
+            updateStats()
+            btnStartPause.setImageResource(R.drawable.ic_play)
+        }
     }
 
     private fun showEditDurationDialog() {
@@ -229,6 +338,11 @@ class PomodoroTimerActivity : AppCompatActivity() {
                 focusMinutes = f
                 breakMinutes = b
                 pauseTimer()
+
+                // Bersihkan cache lama agar setelan durasi baru tidak tertimpa data restore
+                val sharedPrefs = getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+                sharedPrefs.edit().remove("pomo_time_left").apply()
+
                 totalDurationMs = when (currentMode) {
                     TimerMode.FOCUS -> focusMinutes * 60 * 1000L
                     TimerMode.BREAK -> breakMinutes * 60 * 1000L

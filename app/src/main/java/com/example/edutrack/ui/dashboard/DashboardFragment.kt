@@ -21,11 +21,19 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.NotificationCompat
 import java.util.Calendar
 import android.app.AlertDialog
 import android.widget.EditText
 import java.util.*
-import android.content.Intent
 import android.widget.Toast
 import com.example.edutrack.ui.pomodoro.PomodoroTimerActivity
 import com.example.edutrack.ui.flashcard.FlashcardActivity
@@ -38,8 +46,7 @@ class DashboardFragment : Fragment() {
     private lateinit var streakManager: StreakManager
     private lateinit var taskViewModel: TaskViewModel
 
-    // Variabel untuk simpan deadline yang dipilih
-    private var selectedDeadline = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    private var selectedDeadline: String? = null
 
     private var currentCalendarMonth = Calendar.getInstance()
     private val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -61,6 +68,8 @@ class DashboardFragment : Fragment() {
         setupCalendar()
         setupTodoDatabase()
         setupQuickActions()
+
+        renderLearningChart()
 
         streakManager.markTodayAsStudied()
         updateStreakUI()
@@ -85,6 +94,64 @@ class DashboardFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        renderLearningChart()
+    }
+
+    // ── 🌟 REVISI SAKTI: LOGIKA GRAFIK DENGAN RENTANG TANGGAL OTOMATIS & DINAMIS ──
+    private fun renderLearningChart() {
+        try {
+            val sharedPrefs = requireContext().getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+            val cal = Calendar.getInstance(Locale.getDefault())
+
+            // Kunci hari Senin di minggu berjalan
+            cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            val formatLabelTanggal = SimpleDateFormat("d MMM", Locale("id", "ID"))
+            val tanggalSeninStr = formatLabelTanggal.format(cal.time)
+
+            val barViews = arrayOf(
+                binding.barMon, binding.barTue, binding.barWed,
+                binding.barThu, binding.barFri, binding.barSat, binding.barSun
+            )
+
+            var totalMinutesThisWeek = 0f
+            val maxBarHeightPx = 120.dpToPx()
+            val targetMinutesPerDay = 60f
+
+            for (i in 0 until 7) {
+                val tanggalStr = sdf.format(cal.time)
+                val minutesFocused = sharedPrefs.getFloat("pomodoro_time_$tanggalStr", 0f)
+                totalMinutesThisWeek += minutesFocused
+
+                val ratio = if (minutesFocused > targetMinutesPerDay) 1f else minutesFocused / targetMinutesPerDay
+                val calculatedHeight = (ratio * maxBarHeightPx).toInt()
+
+                val barView = barViews[i]
+                val params = barView.layoutParams
+                params.height = if (calculatedHeight < 4.dpToPx() && minutesFocused > 0f) 4.dpToPx() else calculatedHeight
+                barView.layoutParams = params
+
+                // Jika sudah mencapai loop terakhir (Hari Minggu), perbarui teks deskripsi grafik
+                if (i == 6) {
+                    val tanggalMingguStr = formatLabelTanggal.format(cal.time)
+                    val tahunStr = SimpleDateFormat("yyyy", Locale.getDefault()).format(cal.time)
+
+                    binding.tvTotalWeeklyTime.text = String.format(
+                        Locale.getDefault(),
+                        "Minggu Ini (%s - %s %s) • Total: %.1f menit",
+                        tanggalSeninStr, tanggalMingguStr, tahunStr, totalMinutesThisWeek
+                    )
+                }
+
+                cal.add(Calendar.DAY_OF_MONTH, 1)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     private fun setupTodoDatabase() {
         taskViewModel.allTasks.observe(viewLifecycleOwner) { tasks ->
             renderTasks(tasks)
@@ -95,18 +162,16 @@ class DashboardFragment : Fragment() {
             binding.etTodoInput.requestFocus()
         }
 
-        // Logic Pilih Tanggal
         binding.tvSelectedDate.setOnClickListener {
-            showDatePicker { date ->
-                selectedDeadline = date
-                binding.tvSelectedDate.text = "$date"
+            showDateTimePicker { dateTime ->
+                selectedDeadline = dateTime
+                binding.tvSelectedDate.text = dateTime
             }
         }
 
         binding.btnSaveTodo.setOnClickListener {
             val text = binding.etTodoInput.text.toString().trim()
 
-            // 1. Ambil nilai prioritas dari RadioGroup
             val selectedId = binding.rgPriority.checkedRadioButtonId
             val priority = when (selectedId) {
                 R.id.rbLow -> "Low"
@@ -114,7 +179,6 @@ class DashboardFragment : Fragment() {
                 else -> "Medium"
             }
 
-            // 2. Validasi: Pastikan user mengisi teks dan memilih tanggal
             if (text.isNotEmpty() && selectedDeadline != null) {
                 val newTask = Task(
                     title = text,
@@ -124,15 +188,15 @@ class DashboardFragment : Fragment() {
                 )
                 taskViewModel.insert(newTask)
 
-                // 3. Reset UI setelah simpan
+                setTodoAlarmH30(text, selectedDeadline!!)
+
                 binding.etTodoInput.text?.clear()
-                binding.tvSelectedDate.text = "📅 Atur Deadline" // Reset teks
-                selectedDeadline = null // Reset variabel tanggal
-                binding.rgPriority.check(R.id.rbMedium) // Reset prioritas ke Medium
+                binding.tvSelectedDate.text = "📅 Atur Deadline & Jam"
+                selectedDeadline = null
+                binding.rgPriority.check(R.id.rbMedium)
                 binding.llTodoInput.visibility = View.GONE
             } else if (selectedDeadline == null) {
-                // Beri peringatan kalau user lupa pilih tanggal
-                binding.tvSelectedDate.error = "Pilih deadline dulu!"
+                Toast.makeText(requireContext(), "Pilih deadline dan jam terlebih dahulu!", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -187,27 +251,26 @@ class DashboardFragment : Fragment() {
             setPadding(50, 40, 50, 40)
         }
 
-        val roundedBackground = android.graphics.drawable.GradientDrawable().apply {
-            shape = android.graphics.drawable.GradientDrawable.RECTANGLE
-            cornerRadius = 24f
-            setColor(android.graphics.Color.WHITE)
-            setStroke(2, android.graphics.Color.LTGRAY)
-        }
-
         val editText = EditText(context).apply { setText(task.title) }
         val tvDate = TextView(context).apply {
             text = "📅 ${task.deadline}"
             setPadding(0, 20, 0, 20)
+            textSize = 14f
         }
 
         var newDeadline = task.deadline
 
         tvDate.setOnClickListener {
             val cal = Calendar.getInstance()
-            // Hapus "listener = "
             DatePickerDialog(context, { _, y, m, d ->
-                newDeadline = String.format("%04d-%02d-%02d", y, m + 1, d)
-                tvDate.text = "📅 $newDeadline"
+                val selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", y, m + 1, d)
+
+                TimePickerDialog(context, { _, hour, minute ->
+                    val selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
+                    newDeadline = "$selectedDate $selectedTime"
+                    tvDate.text = "📅 $newDeadline"
+                }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
@@ -217,11 +280,11 @@ class DashboardFragment : Fragment() {
         AlertDialog.Builder(context)
             .setTitle("Edit Tugas")
             .setView(layout)
-            // Hapus "text = "
             .setPositiveButton("Simpan") { _, _ ->
                 val newTitle = editText.text.toString().trim()
                 if (newTitle.isNotEmpty()) {
                     taskViewModel.update(task.copy(title = newTitle, deadline = newDeadline))
+                    setTodoAlarmH30(newTitle, newDeadline)
                 }
             }
             .setNegativeButton("Batal", null)
@@ -256,19 +319,69 @@ class DashboardFragment : Fragment() {
         buildCalendarGrid()
     }
 
-    private fun showDatePicker(onDateSelected: (String) -> Unit) {
+    private fun showDateTimePicker(onDateTimeSelected: (String) -> Unit) {
         val calendar = Calendar.getInstance()
-        val datePickerDialog = android.app.DatePickerDialog(
+        val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, year, month, dayOfMonth ->
-                val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
-                onDateSelected(selectedDate)
+                val selectedDate = String.format(Locale.getDefault(), "%04d-%02d-%02d", year, month + 1, dayOfMonth)
+
+                TimePickerDialog(
+                    requireContext(),
+                    { _, hourOfDay, minute ->
+                        val selectedTime = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute)
+                        onDateTimeSelected("$selectedDate $selectedTime")
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                ).show()
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
         datePickerDialog.show()
+    }
+
+    private fun setTodoAlarmH30(taskTitle: String, deadlineStr: String) {
+        try {
+            val sdfParser = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+            val dateDeadline = sdfParser.parse(deadlineStr) ?: return
+
+            val calendar = Calendar.getInstance().apply {
+                time = dateDeadline
+                add(Calendar.MINUTE, -30)
+            }
+
+            if (calendar.timeInMillis <= System.currentTimeMillis()) return
+
+            val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(requireContext(), TodoAlarmReceiver::class.java).apply {
+                putExtra("TASK_TITLE", taskTitle)
+            }
+
+            val uniqueId = taskTitle.hashCode()
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                requireContext(),
+                uniqueId,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                } else {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                }
+            } else {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun buildCalendarGrid() {
@@ -301,7 +414,7 @@ class DashboardFragment : Fragment() {
                     cellView.background = ContextCompat.getDrawable(requireContext(), if(isToday) R.drawable.bg_streak_today else R.drawable.bg_streak_active)
                     cellView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_white))
                 } else {
-                    cellView.setTextColor(ContextCompat.getColor(requireContext(), if(isToday) R.color.text_primary else R.color.text_secondary))
+                    cellView.setTextColor(ContextCompat.getColor(requireContext(), if(isToday) R.drawable.bg_streak_today else R.color.text_secondary))
                 }
             }
             grid.addView(cellView)
@@ -309,24 +422,55 @@ class DashboardFragment : Fragment() {
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
+
     private fun setupQuickActions() {
-        // 1. ISI TOMBOL JADWAL DI SINI:
         binding.btnGoSchedule.setOnClickListener {
             try {
-                // Menggunakan ID yang sinkron dengan XML
                 androidx.navigation.fragment.NavHostFragment.findNavController(this)
                     .navigate(com.example.edutrack.R.id.jadwalFragment)
             } catch (e: Exception) {
                 e.printStackTrace()
-                android.widget.Toast.makeText(requireContext(), "Navigasi Jadwal Gagal: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Navigasi Jadwal Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
             }
-    }
-        binding.btnGoPomodoro.setOnClickListener { }
-        binding.btnGoFlashcard.setOnClickListener { }
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+}
+
+class TodoAlarmReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val taskTitle = intent.getStringExtra("TASK_TITLE") ?: "Tugas"
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val channelId = "edu_track_todo_channel"
+
+        val sharedPrefs = context.getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+        val namaUser = sharedPrefs.getString("user_name", "Halo")?.trim() ?: "Halo"
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Pengingat Batas Waktu Tugas",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Mengingatkan batas waktu pengumpulan tugas EduTrack"
+                enableLights(true)
+                enableVibration(true)
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val builder = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_clock)
+            .setContentTitle("⚠️ Batas Pengumpulan Tugas!")
+            .setContentText("$namaUser, tugas '$taskTitle' tersisa 30 menit lagi! Jangan lupa dikumpulkan ya! 🚀")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+
+        notificationManager.notify(taskTitle.hashCode(), builder.build())
     }
 }

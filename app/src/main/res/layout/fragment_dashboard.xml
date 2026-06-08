@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://tools.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_main"
@@ -12,7 +13,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,7 +28,6 @@
                 android:padding="20dp"
                 android:gravity="center_vertical">
 
-                <!-- App icon + name -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -68,7 +67,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Logout button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogout"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -81,7 +79,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Streak Card (Duolingo style) -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -96,7 +93,6 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- Streak header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -142,7 +138,6 @@
                         android:textSize="24sp"/>
                 </LinearLayout>
 
-                <!-- Calendar week view -->
                 <LinearLayout
                     android:id="@+id/llStreakCalendar"
                     android:layout_width="match_parent"
@@ -150,7 +145,6 @@
                     android:orientation="horizontal"
                     android:layout_marginBottom="12dp"/>
 
-                <!-- Month navigation -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -186,37 +180,21 @@
                         android:padding="6dp"/>
                 </LinearLayout>
 
-                <!-- Day labels -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="6dp">
 
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="M" android:gravity="center"
-                        android:textSize="11sp" android:textColor="@color/text_hint"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="S" android:gravity="center"
-                        android:textSize="11sp" android:textColor="@color/text_hint"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="S" android:gravity="center"
-                        android:textSize="11sp" android:textColor="@color/text_hint"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="R" android:gravity="center"
-                        android:textSize="11sp" android:textColor="@color/text_hint"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="K" android:gravity="center"
-                        android:textSize="11sp" android:textColor="@color/text_hint"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="J" android:gravity="center"
-                        android:textSize="11sp" android:textColor="@color/text_hint"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:text="S" android:gravity="center"
-                        android:textSize="11sp" android:textColor="@color/text_hint"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="M" android:gravity="center" android:textSize="11sp" android:textColor="@color/text_hint"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="S" android:gravity="center" android:textSize="11sp" android:textColor="@color/text_hint"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="S" android:gravity="center" android:textSize="11sp" android:textColor="@color/text_hint"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="R" android:gravity="center" android:textSize="11sp" android:textColor="@color/text_hint"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="K" android:gravity="center" android:textSize="11sp" android:textColor="@color/text_hint"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="J" android:gravity="center" android:textSize="11sp" android:textColor="@color/text_hint"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="S" android:gravity="center" android:textSize="11sp" android:textColor="@color/text_hint"/>
                 </LinearLayout>
 
-                <!-- Calendar grid -->
                 <GridLayout
                     android:id="@+id/calendarGrid"
                     android:layout_width="match_parent"
@@ -227,14 +205,12 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Stats Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="16dp">
 
-            <!-- Tugas Aktif -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -265,7 +241,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Selesai -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -297,7 +272,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Streak -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -329,7 +303,6 @@
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
-        <!-- Todo Section -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -344,7 +317,85 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- Todo header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📊 Produktivitas Belajar (Menit)"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvTotalWeeklyTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total minggu ini: 0 menit"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="24dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:orientation="horizontal"
+                    android:gravity="bottom"
+                    android:weightSum="7"
+                    android:paddingHorizontal="4dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal">
+                        <View android:id="@+id/barMon" android:layout_width="16dp" android:layout_height="0dp" android:background="@drawable/bg_chart_bar"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sen" android:textSize="10sp" android:textColor="@color/text_hint" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal">
+                        <View android:id="@+id/barTue" android:layout_width="16dp" android:layout_height="0dp" android:background="@drawable/bg_chart_bar"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sel" android:textSize="10sp" android:textColor="@color/text_hint" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal">
+                        <View android:id="@+id/barWed" android:layout_width="16dp" android:layout_height="0dp" android:background="@drawable/bg_chart_bar"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rab" android:textSize="10sp" android:textColor="@color/text_hint" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal">
+                        <View android:id="@+id/barThu" android:layout_width="16dp" android:layout_height="0dp" android:background="@drawable/bg_chart_bar"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kam" android:textSize="10sp" android:textColor="@color/text_hint" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal">
+                        <View android:id="@+id/barFri" android:layout_width="16dp" android:layout_height="0dp" android:background="@drawable/bg_chart_bar"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jum" android:textSize="10sp" android:textColor="@color/text_hint" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal">
+                        <View android:id="@+id/barSat" android:layout_width="16dp" android:layout_height="0dp" android:background="@drawable/bg_chart_bar"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sab" android:textSize="10sp" android:textColor="@color/text_hint" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="bottom|center_horizontal">
+                        <View android:id="@+id/barSun" android:layout_width="16dp" android:layout_height="0dp" android:background="@drawable/bg_chart_bar"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Min" android:textSize="10sp" android:textColor="@color/text_hint" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/bg_card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -370,7 +421,6 @@
                         app:cornerRadius="8dp"/>
                 </LinearLayout>
 
-                <!-- Todo input (hidden by default) -->
                 <LinearLayout
                     android:id="@+id/llTodoInput"
                     android:layout_width="match_parent"
@@ -427,14 +477,12 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Todo list -->
                 <LinearLayout
                     android:id="@+id/llTodoList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"/>
 
-                <!-- Empty state -->
                 <TextView
                     android:id="@+id/tvEmptyTodo"
                     android:layout_width="match_parent"
@@ -449,7 +497,6 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Quick Actions -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -458,67 +505,67 @@
             app:cardElevation="2dp"
             app:cardBackgroundColor="@color/bg_card">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⚡ Aksi Cepat"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="16dp"/>
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="3">
+                android:orientation="vertical"
+                android:padding="20dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnGoSchedule"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
-                    android:text="Jadwal"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:cornerRadius="10dp"/>
+                    android:text="⚡ Aksi Cepat"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="16dp"/>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnGoPomodoro"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp"
-                    android:text="Pomodoro"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:cornerRadius="10dp"/>
+                    android:orientation="horizontal"
+                    android:weightSum="3">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnGoFlashcard"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:text="Flashcard"
-                    android:textSize="11sp"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    app:cornerRadius="10dp"/>
-            </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGoSchedule"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="Jadwal"
+                        android:textSize="11sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:cornerRadius="10dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGoPomodoro"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:text="Pomodoro"
+                        android:textSize="11sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:cornerRadius="10dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGoFlashcard"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="Flashcard"
+                        android:textSize="11sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:cornerRadius="10dp"/>
+                </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
