@@ -359,17 +359,31 @@ class DashboardFragment : Fragment() {
         datePickerDialog.show()
     }
 
+    // ── 🌟 REVISI TOTAL: LOGIKA ALARM DENGAN FLAG_MUTABLE & TOAST FORENSIK ──
     private fun setTodoAlarmH30(taskTitle: String, deadlineStr: String) {
         try {
             val sdfParser = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
             val dateDeadline = sdfParser.parse(deadlineStr) ?: return
 
-            val calendar = Calendar.getInstance().apply {
+            val currentTimeMs = System.currentTimeMillis()
+            val alarmCalendar = Calendar.getInstance().apply {
                 time = dateDeadline
-                add(Calendar.MINUTE, -30)
             }
 
-            if (calendar.timeInMillis <= System.currentTimeMillis()) return
+            val timeDifferenceMs = alarmCalendar.timeInMillis - currentTimeMs
+            val triggerTimeMs: Long
+
+            if (timeDifferenceMs > 30 * 60 * 1000) {
+                triggerTimeMs = alarmCalendar.timeInMillis - (30 * 60 * 1000)
+                Toast.makeText(requireContext(), "Alarm diset: 30 menit sebelum deadline", Toast.LENGTH_SHORT).show()
+            } else if (timeDifferenceMs > 0) {
+                // Skenario Mepet: Paksa langsung bunyi 5 detik lagi untuk keperluan tes!
+                triggerTimeMs = currentTimeMs + 5000
+                Toast.makeText(requireContext(), "Jadwal mepet! Notif akan bunyi dalam 5 detik...", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireContext(), "Eror: Waktu deadline sudah terlewat!", Toast.LENGTH_SHORT).show()
+                return
+            }
 
             val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(requireContext(), TodoAlarmReceiver::class.java).apply {
@@ -378,28 +392,28 @@ class DashboardFragment : Fragment() {
 
             val uniqueId = taskTitle.hashCode()
 
+            // 🔥 PERBAIKAN UTAMA: Gunakan FLAG_MUTABLE agar putExtra DATA TIDAK DIBUANG OMEN OLEH ANDROID OS
             val pendingIntent = PendingIntent.getBroadcast(
                 requireContext(),
                 uniqueId,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent)
                 } else {
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent)
                 }
             } else {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent)
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            Toast.makeText(requireContext(), "Gagal memasang alarm: ${e.message}", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    // ── 🌟 REVISI SAKTI: PROTEKSI TOTAL RENDERING GRID KALENDER (ANTI-FORCE CLOSE) ──
+    }// ── 🌟 REVISI SAKTI: PROTEKSI TOTAL RENDERING GRID KALENDER (ANTI-FORCE CLOSE) ──
     private fun buildCalendarGrid() {
         try {
             val grid = binding.calendarGrid
@@ -478,36 +492,40 @@ class DashboardFragment : Fragment() {
     }
 }
 
+// ── 🌟 REVISI SAKTI: RECEIVER MANDIRI (ANTI-MOGOK & TANPA DEPENDENCY SHAREDPREFS) ──
 class TodoAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val taskTitle = intent.getStringExtra("TASK_TITLE") ?: "Tugas"
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "edu_track_todo_channel"
+        try {
+            val taskTitle = intent.getStringExtra("TASK_TITLE") ?: "Tugas Baru"
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channelId = "edu_track_todo_channel"
 
-        val sharedPrefs = context.getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
-        val namaUser = sharedPrefs.getString("user_name", "Halo")?.trim() ?: "Halo"
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Pengingat Batas Waktu Tugas",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Mengingatkan batas waktu pengumpulan tugas EduTrack"
-                enableLights(true)
-                enableVibration(true)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    channelId,
+                    "Pengingat Batas Waktu Tugas",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Mengingatkan batas waktu pengumpulan tugas EduTrack"
+                    enableLights(true)
+                    enableVibration(true)
+                }
+                notificationManager.createNotificationChannel(channel)
             }
-            notificationManager.createNotificationChannel(channel)
+
+            // Hapus pemanggilan SharedPrefs agar tidak memicu silent-crash pasca-clear data
+            val builder = NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.ic_clock) // Pastikan ikon ic_clock ini ada di folder drawable-mu!
+                .setContentTitle("⚠️ Batas Pengumpulan Tugas!")
+                .setContentText("Yuk, tugas '$taskTitle' harus segera diselesaikan sekarang! 🚀")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+
+            notificationManager.notify(taskTitle.hashCode(), builder.build())
+
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
-        val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_clock)
-            .setContentTitle("⚠️ Batas Pengumpulan Tugas!")
-            .setContentText("$namaUser, tugas '$taskTitle' tersisa 30 menit lagi! Jangan lupa dikumpulkan ya! 🚀")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-
-        notificationManager.notify(taskTitle.hashCode(), builder.build())
     }
 }

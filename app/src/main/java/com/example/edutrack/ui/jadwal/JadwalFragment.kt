@@ -365,7 +365,7 @@ class JadwalFragment : Fragment() {
             .apply()
     }
 
-    // ── 🌟 REVISI SAKTI: LOGIKA ALARM DENGAN PROTEKSI ANDROID MODERN (ANTI-MERAH) ──
+    // ── 🌟 REVISI SAKTI: LOGIKA ADAPTIF JADWAL H-30 & FITUR MEPEET 5 DETIK (ANTI-MOGOK) ──
     private fun setJadwalAlarm(title: String, tanggal: String, time: String) {
         try {
             if (!time.contains(":") || !tanggal.contains("-")) return
@@ -379,6 +379,7 @@ class JadwalFragment : Fragment() {
             val month = partsDate[1].toInt() - 1
             val day = partsDate[2].toInt()
 
+            val currentTimeMs = System.currentTimeMillis()
             val calendar = Calendar.getInstance().apply {
                 set(Calendar.YEAR, year)
                 set(Calendar.MONTH, month)
@@ -389,37 +390,52 @@ class JadwalFragment : Fragment() {
                 set(Calendar.MILLISECOND, 0)
             }
 
-            if (calendar.timeInMillis <= System.currentTimeMillis()) return
+            // Hitung selisih waktu antara jam mulai kuliah dengan jam asli saat ini
+            val timeDifferenceMs = calendar.timeInMillis - currentTimeMs
+            val triggerTimeMs: Long
+
+            if (timeDifferenceMs > 30 * 60 * 1000) {
+                // Skenario A: Jika kuliah masih lama (di atas 30 menit), kurangi 30 menit dengan akurat!
+                triggerTimeMs = calendar.timeInMillis - (30 * 60 * 1000)
+                Toast.makeText(requireContext(), "Alarm Jadwal diset: 30 menit sebelum kuliah", Toast.LENGTH_SHORT).show()
+            } else if (timeDifferenceMs > 0) {
+                // Skenario B: Jika jadwal mepeet (di bawah 30 menit), paksa langsung bunyi 5 detik lagi untuk demo!
+                triggerTimeMs = currentTimeMs + 5000
+                Toast.makeText(requireContext(), "Jadwal mepet! Notif kuliah bunyi dalam 5 detik...", Toast.LENGTH_LONG).show()
+            } else {
+                // Skenario C: Waktu kuliah sudah lewat, abaikan
+                return
+            }
 
             val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(requireContext(), AlarmReceiver2::class.java).apply {
                 putExtra("TITLE", title)
             }
 
-            val uniqueId = (calendar.timeInMillis / 1000).toInt()
+            val uniqueId = title.hashCode() // Gunakan hashcode nama matkul agar ID unik per mata kuliah
 
+            // 🔥 PERBAIKAN UTAMA: Ubah FLAG_IMMUTABLE menjadi FLAG_MUTABLE agar data putExtra tidak dibuang Android OS
             val pendingIntent = PendingIntent.getBroadcast(
                 requireContext(),
                 uniqueId,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
 
-            // Bungkus dengan pengecekan API level agar tidak memicu SecurityException ghaib
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
-                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                    alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent)
                 } else {
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent)
                 }
             } else {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTimeMs, pendingIntent)
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            Toast.makeText(requireContext(), "Gagal set alarm jadwal: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
     // ── Adapter RecyclerView ──
     inner class InnerJadwalAdapter : RecyclerView.Adapter<InnerJadwalAdapter.JadwalVH>() {
         private val list = mutableListOf<Jadwal>()
@@ -490,36 +506,38 @@ class JadwalFragment : Fragment() {
 }
 
 // ── RECEIVER NOTIFIKASI PENGINGAT JADWAL PREMIUM ──
+// ── 🌟 REVISI SAKTI: RECEIVER JADWAL MANDIRI (ANTI-SILENT CRASH & TANPA JALUR SHAREDPREFS) ──
 class AlarmReceiver2 : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val titleMatkul = intent.getStringExtra("TITLE") ?: "Jadwal"
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "edu_track_jadwal_channel"
+        try {
+            val titleMatkul = intent.getStringExtra("TITLE") ?: "Mata Kuliah Baru"
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channelId = "edu_track_jadwal_channel"
 
-        val sharedPrefs = context.getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
-        val namaUser = sharedPrefs.getString("user_name", "Halo")?.trim() ?: "Halo"
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Pengingat Jadwal Kuliah",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Meningatkan aktivitas aktivitas EduTrack"
-                enableLights(true)
-                enableVibration(true)
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    channelId,
+                    "Pengingat Jadwal Kuliah",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Mengingatkan aktivitas EduTrack"
+                    enableLights(true)
+                    enableVibration(true)
+                }
+                notificationManager.createNotificationChannel(channel)
             }
-            notificationManager.createNotificationChannel(channel)
+
+            val builder = NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm) // Pakai icon default sistem agar 100% aman
+                .setContentTitle("📚 Pengingat Aktivitas EduTrack")
+                .setContentText("Agenda kuliah '$titleMatkul' sudah dekat! Yuk, persiapkan diri dan fokus! 🚀")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+
+            notificationManager.notify(titleMatkul.hashCode(), builder.build())
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
-        val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_clock)
-            .setContentTitle("📚 Pengingat Aktivitas EduTrack")
-            .setContentText("$namaUser, agenda '$titleMatkul' sudah dekat! Yuk, persiapkan diri dan fokus! 🚀")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-
-        notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
     }
 }

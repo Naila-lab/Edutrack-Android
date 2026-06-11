@@ -76,7 +76,7 @@ dependencies {
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.espresso:espresso-core:3.6.1")
+    //androidTestImplementation("androidx.espresso:espresso-core:3.5.1")
 
     implementation("com.google.code.gson:gson:2.10.1")
 

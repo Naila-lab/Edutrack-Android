@@ -32,7 +32,9 @@
 
         <receiver
             android:name=".ui.dashboard.TodoAlarmReceiver"
-            android:exported="false" />
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
 
         <activity
             android:name=".MainActivity"
