@@ -2,7 +2,6 @@ package com.example.edutrack.ui.dashboard
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.edutrack.ui.dashboard.Task
 
 @Dao
 interface TaskDao {
@@ -17,4 +16,11 @@ interface TaskDao {
 
     @Query("SELECT * FROM task_table ORDER BY id DESC")
     fun getAllTasks(): LiveData<List<Task>>
+
+    // ── 🌟 FITUR BARU: MANAJEMEN RIWAYAT POMODORO DATABASE ──
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertPomodoroHistory(history: PomodoroHistory)
+
+    @Query("SELECT * FROM pomodoro_history_table ORDER BY id DESC")
+    fun getAllPomodoroHistory(): LiveData<List<PomodoroHistory>>
 }

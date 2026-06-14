@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- ── 🌟 NAV GRAPH EDUTRACK ASLI: SINKRONISASI ARSITEKTUR FRAGMENT & ACTIVITY ── -->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://tools.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
+    <!-- 1. AUTH DESTINATIONS -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.edutrack.ui.auth.LoginFragment"
@@ -32,6 +34,7 @@
         android:name="com.example.edutrack.ui.auth.ResetPasswordFragment"
         android:label="Reset Password"/>
 
+    <!-- 2. CORE DASHBOARD FRAGMENT -->
     <fragment
         android:id="@+id/dashboardFragment"
         android:name="com.example.edutrack.ui.dashboard.DashboardFragment"
@@ -46,10 +49,24 @@
             app:destination="@id/jadwalFragment" />
     </fragment>
 
+    <!-- 3. CORE JADWAL FRAGMENT -->
     <fragment
         android:id="@+id/jadwalFragment"
         android:name="com.example.edutrack.ui.jadwal.JadwalFragment"
         android:label="fragment_jadwal"
         tools:layout="@layout/fragment_jadwal" />
 
+    <!-- 🔥 4. REVISI UTAMA: STRUKTUR TAG FRAGMENT POMODORO YANG BENAR & VALID -->
+    <fragment
+        android:id="@+id/pomodoroTimerActivity"
+        android:name="com.example.edutrack.ui.pomodoro.PomodoroTimerFragment"
+        android:label="Pomodoro Timer"
+        tools:layout="@layout/fragment_pomodoro_timer" />
+
+    <!-- 5. TEMPORARY FLASHCARD ACTIVITY DESTINATION -->
+    <fragment
+        android:id="@+id/flashcardActivity"
+        android:name="com.example.edutrack.ui.flashcard.FlashcardFragment"
+        android:label="Flashcard"
+        tools:layout="@layout/fragment_flashcard" />
 </navigation>

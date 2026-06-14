@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Durasi Fokus (menit)"
+        android:text="Durasi Fokus (10 - 60 menit)"
         android:textSize="13sp"
         android:textColor="@color/textSecondary"
         android:layout_marginBottom="6dp" />
@@ -29,7 +29,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Durasi Break (menit)"
+        android:text="Durasi Jeda Pendek (1 - 15 menit)"
         android:textSize="13sp"
         android:textColor="@color/textSecondary"
         android:layout_marginBottom="6dp" />
@@ -43,6 +43,25 @@
         android:hint="Contoh: 5"
         android:inputType="number"
         android:textSize="15sp"
-        android:textColor="@color/textPrimary" />
+        android:textColor="@color/textPrimary"
+        android:layout_marginBottom="16dp" />
 
-</LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Durasi Jeda Panjang (10 - 30 menit)"
+        android:textSize="13sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/etLongBreak"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_spinner"
+        android:paddingHorizontal="16dp"
+        android:hint="Contoh: 15"
+        android:inputType="number"
+        android:textSize="15sp"
+        android:textColor="@color/textPrimary"
+        android:layout_marginBottom="8dp" /> </LinearLayout>

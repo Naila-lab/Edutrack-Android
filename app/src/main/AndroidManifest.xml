@@ -19,11 +19,7 @@
         android:theme="@style/Theme.EduTrack">
 
         <activity
-            android:name=".ui.flashcard.FlashcardActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".ui.pomodoro.PomodoroTimerActivity"
+            android:name=".ui.pomodoro.PomodoroTimerFragment"
             android:exported="false" />
 
         <receiver
@@ -46,6 +42,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".ui.dashboard.StreakReminderReceiver"
+            android:enabled="true"
+            android:exported="false" />
 
     </application>
 </manifest>

@@ -5,8 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-// Pastikan hanya mengurus Task, karena Jadwal sudah pindah ke SharedPreferences
-@Database(entities = [Task::class], version = 2, exportSchema = false)
+// 🔥 REVISI: Tambahkan entitas baru dan naikkan version ke 3
+@Database(entities = [Task::class, PomodoroHistory::class], version = 3, exportSchema = false)
 abstract class EduTrackDatabase : RoomDatabase() {
 
     abstract fun taskDao(): TaskDao
@@ -22,7 +22,7 @@ abstract class EduTrackDatabase : RoomDatabase() {
                     EduTrackDatabase::class.java,
                     "edutrack_database"
                 )
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration() // Aman menghapus cache tabel lama saat naik versi
                     .build()
                 INSTANCE = instance
                 instance

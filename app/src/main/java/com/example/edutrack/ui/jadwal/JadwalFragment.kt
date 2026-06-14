@@ -346,12 +346,19 @@ class JadwalFragment : Fragment() {
 
     private fun deleteJadwal(jadwal: Jadwal) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Hapus Jadwal?")
-            .setMessage("Apakah yakin ingin menghapus '${jadwal.mataKuliah}'?")
+            .setTitle("Hapus Jadwal Kuliah?")
+            .setMessage("Apakah kamu benar-benar yakin ingin menghapus agenda perkuliahan '${jadwal.mataKuliah}'?")
+            .setIcon(android.R.drawable.ic_dialog_alert)
             .setPositiveButton("Hapus") { _, _ ->
+                // Proses eliminasi data dari List lokal
                 allJadwalList.remove(jadwal)
+
+                // Sinkronisasi ulang ke SharedPreferences agar data permanen hilang
                 saveToSharedPreferences()
-                Toast.makeText(requireContext(), "Data berhasil dihapus", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(requireContext(), "Jadwal '${jadwal.mataKuliah}' sukses dieliminasi!", Toast.LENGTH_SHORT).show()
+
+                // Reload UI agar list RecyclerView langsung disegarkan secara real-time
                 loadJadwalTotal()
             }
             .setNegativeButton("Batal", null)
@@ -365,7 +372,6 @@ class JadwalFragment : Fragment() {
             .apply()
     }
 
-    // ── 🌟 REVISI SAKTI: LOGIKA ADAPTIF JADWAL H-30 & FITUR MEPEET 5 DETIK (ANTI-MOGOK) ──
     private fun setJadwalAlarm(title: String, tanggal: String, time: String) {
         try {
             if (!time.contains(":") || !tanggal.contains("-")) return
@@ -506,7 +512,6 @@ class JadwalFragment : Fragment() {
 }
 
 // ── RECEIVER NOTIFIKASI PENGINGAT JADWAL PREMIUM ──
-// ── 🌟 REVISI SAKTI: RECEIVER JADWAL MANDIRI (ANTI-SILENT CRASH & TANPA JALUR SHAREDPREFS) ──
 class AlarmReceiver2 : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         try {

@@ -13,9 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.edutrack.R
-import com.example.edutrack.ui.dashboard.TaskViewModel
 import com.example.edutrack.databinding.FragmentDashboardBinding
-import com.example.edutrack.ui.dashboard.Task
 import com.example.edutrack.utils.StreakManager
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -29,14 +27,16 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.app.NotificationCompat
 import java.util.Calendar
 import android.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.EditText
 import java.util.*
 import android.widget.Toast
-import com.example.edutrack.ui.pomodoro.PomodoroTimerActivity
-import com.example.edutrack.ui.flashcard.FlashcardActivity
 import kotlin.math.ceil
 
 class DashboardFragment : Fragment() {
@@ -53,6 +53,13 @@ class DashboardFragment : Fragment() {
     private val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val monthFormat = SimpleDateFormat("MMMM yyyy", Locale("id", "ID"))
 
+    private val kategoriList = arrayOf("Kuis", "UTS", "UAS", "Laporan", "Proyek", "Lainnya")
+
+    private var allTasksList: List<Task> = emptyList()
+    private var currentSearchQuery: String = ""
+    private var currentFilterPriority: String = "Semua Prioritas"
+    private var currentFilterCategory: String = "Semua Kategori"
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         return binding.root
@@ -68,45 +75,105 @@ class DashboardFragment : Fragment() {
         setupStreak()
         setupCalendar()
         setupTodoDatabase()
-        setupQuickActions()
 
         renderLearningChart()
+        updateBadgesUI()
 
         streakManager.markTodayAsStudied()
         updateStreakUI()
 
-        binding.btnGoFlashcard.setOnClickListener {
-            try {
-                val intent = Intent(requireContext(), FlashcardActivity::class.java)
-                startActivity(intent)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-
-        binding.btnGoPomodoro.setOnClickListener {
-            try {
-                val intent = Intent(requireContext(), PomodoroTimerActivity::class.java)
-                startActivity(intent)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(requireContext(), "Gagal membuka halaman Pomodoro: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
+        // ── 🌟 FITUR BARU: AKTIFKAN PENGINGAT STREAK SETIAP JAM 20:00 MALAM ──
+        scheduleDailyStreakReminder()
     }
 
     override fun onResume() {
         super.onResume()
         renderLearningChart()
+        updateBadgesUI()
     }
 
-    // ── 🌟 REVISI SAKTI: LOGIKA GRAFIK DENGAN RENTANG TANGGAL OTOMATIS & DINAMIS ──
+    // ── 🌟 FITUR BARU: LOGIKA PENJADWALAN ALARM NOTIFIKASI STREAK HARIAN ──
+    private fun scheduleDailyStreakReminder() {
+        try {
+            val context = requireContext()
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(context, StreakReminderReceiver::class.java)
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                context,
+                999, // ID Unik khusus alarm streak reminder
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = System.currentTimeMillis()
+                set(Calendar.HOUR_OF_DAY, 20) // Notifikasi dipicu jam 8 malam
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+            }
+
+            // Jika jam 8 malam hari ini sudah lewat, jadwalkan untuk besok malam
+            if (calendar.timeInMillis <= System.currentTimeMillis()) {
+                calendar.add(Calendar.DAY_OF_MONTH, 1)
+            }
+
+            // Set alarm berulang setiap 24 jam secara presisi agar awet di background OS Android
+            alarmManager.setInexactRepeating(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                AlarmManager.INTERVAL_DAY,
+                pendingIntent
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun updateBadgesUI() {
+        try {
+            val sharedPrefs = requireContext().getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+            val currentStreak = sharedPrefs.getInt("current_user_streak", 0)
+
+            // ── 🌟 PERBAIKAN SAKLEK: SINTAKS PEMANGGILAN ID KOTLIN YANG BENAR ──
+            val ivBadgePemula    = view?.findViewById<TextView>(R.id.ivBadgePemula)
+            val ivBadgeKonsisten = view?.findViewById<TextView>(R.id.ivBadgeKonsisten)
+            val ivBadgeJuara     = view?.findViewById<TextView>(R.id.ivBadgeJuara)
+
+            if (currentStreak >= 7) {
+                ivBadgePemula?.alpha = 1.0f
+                ivBadgePemula?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+            } else {
+                ivBadgePemula?.alpha = 0.3f
+                ivBadgePemula?.setTextColor(android.graphics.Color.GRAY)
+            }
+
+            if (currentStreak >= 14) {
+                ivBadgeKonsisten?.alpha = 1.0f
+                ivBadgeKonsisten?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+            } else {
+                ivBadgeKonsisten?.alpha = 0.3f
+                ivBadgeKonsisten?.setTextColor(android.graphics.Color.GRAY)
+            }
+
+            if (currentStreak >= 30) {
+                ivBadgeJuara?.alpha = 1.0f
+                ivBadgeJuara?.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
+            } else {
+                ivBadgeJuara?.alpha = 0.3f
+                ivBadgeJuara?.setTextColor(android.graphics.Color.GRAY)
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     private fun renderLearningChart() {
         try {
             val sharedPrefs = requireContext().getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
             val cal = Calendar.getInstance(Locale.getDefault())
 
-            // Kunci hari Senin di minggu berjalan
             cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
             val formatLabelTanggal = SimpleDateFormat("d MMM", Locale("id", "ID"))
             val tanggalSeninStr = formatLabelTanggal.format(cal.time)
@@ -133,7 +200,6 @@ class DashboardFragment : Fragment() {
                 params.height = if (calculatedHeight < 4.dpToPx() && minutesFocused > 0f) 4.dpToPx() else calculatedHeight
                 barView.layoutParams = params
 
-                // Jika sudah mencapai loop terakhir (Hari Minggu), perbarui teks deskripsi grafik
                 if (i == 6) {
                     val tanggalMingguStr = formatLabelTanggal.format(cal.time)
                     val tahunStr = SimpleDateFormat("yyyy", Locale.getDefault()).format(cal.time)
@@ -155,8 +221,40 @@ class DashboardFragment : Fragment() {
 
     private fun setupTodoDatabase() {
         taskViewModel.allTasks.observe(viewLifecycleOwner) { tasks ->
-            renderTasks(tasks)
+            allTasksList = tasks
+            applyFilterAndSearch()
         }
+
+        val spinnerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, kategoriList)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerTodoCategory.adapter = spinnerAdapter
+
+        val priorityFilterOptions = arrayOf("Semua Prioritas", "High", "Medium", "Low")
+        val categoryFilterOptions = arrayOf("Semua Kategori", "Kuis", "UTS", "UAS", "Laporan", "Proyek", "Lainnya")
+
+        binding.spinnerFilterPriority.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, priorityFilterOptions)
+        binding.spinnerFilterCategory.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryFilterOptions)
+
+        val filterItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                currentFilterPriority = binding.spinnerFilterPriority.selectedItem.toString()
+                currentFilterCategory = binding.spinnerFilterCategory.selectedItem.toString()
+                applyFilterAndSearch()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        binding.spinnerFilterPriority.onItemSelectedListener = filterItemSelectedListener
+        binding.spinnerFilterCategory.onItemSelectedListener = filterItemSelectedListener
+
+        binding.etSearchTodo.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                currentSearchQuery = s.toString().trim().lowercase()
+                applyFilterAndSearch()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         binding.btnAddTodo.setOnClickListener {
             binding.llTodoInput.visibility = View.VISIBLE
@@ -171,7 +269,10 @@ class DashboardFragment : Fragment() {
         }
 
         binding.btnSaveTodo.setOnClickListener {
-            val text = binding.etTodoInput.text.toString().trim()
+            val titleText = binding.etTodoInput.text.toString().trim()
+            val subjectText = binding.etTodoSubjectInput.text.toString().trim()
+            val descriptionText = binding.etTodoDescriptionInput.text.toString().trim()
+            val categoryText = binding.spinnerTodoCategory.selectedItem.toString()
 
             val selectedId = binding.rgPriority.checkedRadioButtonId
             val priority = when (selectedId) {
@@ -180,69 +281,185 @@ class DashboardFragment : Fragment() {
                 else -> "Medium"
             }
 
-            if (text.isNotEmpty() && selectedDeadline != null) {
+            if (titleText.isNotEmpty() && subjectText.isNotEmpty() && selectedDeadline != null) {
                 val newTask = Task(
-                    title = text,
-                    subject = "Umum",
+                    title = titleText,
+                    subject = subjectText,
                     priority = priority,
-                    deadline = selectedDeadline!!
+                    deadline = selectedDeadline!!,
+                    description = descriptionText,
+                    category = categoryText
                 )
                 taskViewModel.insert(newTask)
 
-                setTodoAlarmH30(text, selectedDeadline!!)
+                setTodoAlarmH30(titleText, selectedDeadline!!)
 
                 binding.etTodoInput.text?.clear()
+                binding.etTodoSubjectInput.text?.clear()
+                binding.etTodoDescriptionInput.text?.clear()
+                binding.spinnerTodoCategory.setSelection(0)
                 binding.tvSelectedDate.text = "📅 Atur Deadline & Jam"
                 selectedDeadline = null
                 binding.rgPriority.check(R.id.rbMedium)
                 binding.llTodoInput.visibility = View.GONE
-            } else if (selectedDeadline == null) {
-                Toast.makeText(requireContext(), "Pilih deadline dan jam terlebih dahulu!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Harap isi Judul, Mata Kuliah, dan Deadline!", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun renderTasks(tasks: List<Task>) {
-        val container = binding.llTodoList
-        container.removeAllViews()
+    private fun applyFilterAndSearch() {
+        try {
+            var filteredTasks = allTasksList
 
-        if (tasks.isEmpty()) {
+            if (currentFilterPriority != "Semua Prioritas") {
+                filteredTasks = filteredTasks.filter { it.priority == currentFilterPriority }
+            }
+
+            if (currentFilterCategory != "Semua Kategori") {
+                filteredTasks = filteredTasks.filter { it.category == currentFilterCategory }
+            }
+
+            if (currentSearchQuery.isNotEmpty()) {
+                filteredTasks = filteredTasks.filter {
+                    it.title.lowercase().contains(currentSearchQuery) ||
+                            it.subject.lowercase().contains(currentSearchQuery)
+                }
+            }
+
+            val sortedTasks = filteredTasks.sortedWith(compareBy<Task> { it.deadline })
+
+            val uncompletedTasks = sortedTasks.filter { !it.isDone }
+            val completedTasks = sortedTasks.filter { it.isDone }
+
+            renderTwoSectionsTasks(uncompletedTasks, completedTasks)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun updateTaskCounters() {
+        binding.tvTaskCount.text = allTasksList.count { !it.isDone }.toString()
+        binding.tvDoneCount.text = allTasksList.count { it.isDone }.toString()
+    }
+
+    private fun renderTwoSectionsTasks(uncompleted: List<Task>, completed: List<Task>) {
+        val containerUncompleted = binding.llTodoListUncompleted
+        val containerCompleted = binding.llTodoListCompleted
+
+        containerUncompleted.removeAllViews()
+        containerCompleted.removeAllViews()
+
+        binding.tvHeaderUncompleted.visibility = if (uncompleted.isNotEmpty()) View.VISIBLE else View.GONE
+        binding.tvHeaderCompleted.visibility = if (completed.isNotEmpty()) View.VISIBLE else View.GONE
+
+        if (uncompleted.isEmpty() && completed.isEmpty()) {
             binding.tvEmptyTodo.visibility = View.VISIBLE
         } else {
             binding.tvEmptyTodo.visibility = View.GONE
-            tasks.forEach { task ->
-                val itemView = LayoutInflater.from(requireContext()).inflate(R.layout.item_todo, container, false)
-
-                val tvText = itemView.findViewById<TextView>(R.id.tvTodoText)
-                val cbDone = itemView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbTodoDone)
-                val btnDelete = itemView.findViewById<View>(R.id.btnTodoDelete)
-                val btnEdit = itemView.findViewById<View>(R.id.btnTodoEdit)
-                val tvDeadline = itemView.findViewById<TextView>(R.id.tvTodoDeadline)
-                val tvPriority = itemView.findViewById<TextView>(R.id.tvPriorityLabel)
-
-                tvText.text = task.title
-                tvDeadline.text = task.deadline
-                cbDone.isChecked = task.isDone
-                tvPriority.text = task.priority
-
-                val color = when (task.priority) {
-                    "Low" -> android.graphics.Color.parseColor("#22C55E")
-                    "High" -> android.graphics.Color.RED
-                    else -> android.graphics.Color.parseColor("#EAB308")
-                }
-                tvPriority.setTextColor(color)
-
-                btnDelete.setOnClickListener { taskViewModel.delete(task) }
-                btnEdit.setOnClickListener { showEditDialog(task) }
-                cbDone.setOnCheckedChangeListener { _, isChecked ->
-                    taskViewModel.update(task.copy(isDone = isChecked))
-                }
-
-                container.addView(itemView)
-            }
         }
-        binding.tvTaskCount.text = tasks.count { !it.isDone }.toString()
-        binding.tvDoneCount.text = tasks.count { it.isDone }.toString()
+
+        val inflater = LayoutInflater.from(requireContext())
+
+        uncompleted.forEach { task ->
+            val itemView = inflater.inflate(R.layout.item_todo, containerUncompleted, false)
+            bindTaskToView(itemView, task)
+            containerUncompleted.addView(itemView)
+        }
+
+        completed.forEach { task ->
+            val itemView = inflater.inflate(R.layout.item_todo, containerCompleted, false)
+            bindTaskToView(itemView, task)
+            containerCompleted.addView(itemView)
+        }
+
+        updateTaskCounters()
+    }
+
+    private fun bindTaskToView(itemView: View, task: Task) {
+        val tvText = itemView.findViewById<TextView>(R.id.tvTodoText)
+        val tvSubject = itemView.findViewById<TextView>(R.id.tvTodoSubject)
+        val tvDescription = itemView.findViewById<TextView>(R.id.tvTodoDescription)
+        val tvCategoryBadge = itemView.findViewById<TextView>(R.id.tvTodoCategoryBadge)
+        val cbDone = itemView.findViewById<com.google.android.material.checkbox.MaterialCheckBox>(R.id.cbTodoDone)
+        val tvDeadline = itemView.findViewById<TextView>(R.id.tvTodoDeadline)
+        val tvPriority = itemView.findViewById<TextView>(R.id.tvPriorityLabel)
+
+        val rootItem = itemView.findViewById<LinearLayout>(R.id.rootTodoItem)
+
+        tvText.text = task.title
+        tvSubject.text = "Mata Kuliah: ${task.subject}"
+        cbDone.isChecked = task.isDone
+
+        try {
+            val sdfParser = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+            val dateDeadline = sdfParser.parse(task.deadline)
+            val currentTimeMs = System.currentTimeMillis()
+
+            if (dateDeadline != null && dateDeadline.time < currentTimeMs && !task.isDone) {
+                tvDeadline.text = "${task.deadline} ⚠️ (Terlambat!)"
+                tvDeadline.setTextColor(android.graphics.Color.parseColor("#DC2626"))
+                tvDeadline.setTypeface(null, Typeface.BOLD)
+            } else {
+                tvDeadline.text = task.deadline
+                tvDeadline.setTextColor(android.graphics.Color.parseColor("#334155"))
+                tvDeadline.setTypeface(null, Typeface.NORMAL)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            tvDeadline.text = task.deadline
+            tvDeadline.setTextColor(android.graphics.Color.parseColor("#334155"))
+        }
+
+        if (task.description.isEmpty()) {
+            tvDescription.visibility = View.GONE
+        } else {
+            tvDescription.visibility = View.VISIBLE
+            tvDescription.text = task.description
+        }
+
+        tvCategoryBadge.text = task.category.uppercase()
+        val badgeColor = when (task.category) {
+            "Kuis" -> "#F59E0B"
+            "UTS" -> "#EF4444"
+            "UAS" -> "#DC2626"
+            "Laporan" -> "#10B981"
+            "Proyek" -> "#3B82F6"
+            else -> "#64748B"
+        }
+        tvCategoryBadge.setBackgroundColor(android.graphics.Color.parseColor(badgeColor))
+
+        val color = when (task.priority) {
+            "Low" -> android.graphics.Color.parseColor("#22C55E")
+            "High" -> android.graphics.Color.RED
+            else -> android.graphics.Color.parseColor("#EAB308")
+        }
+        tvPriority.setTextColor(color)
+        tvPriority.text = task.priority
+
+        rootItem.setOnClickListener {
+            showEditDialog(task)
+        }
+
+        rootItem.setOnLongClickListener {
+            val context = itemView.context
+            AlertDialog.Builder(context)
+                .setTitle("Hapus Tugas Permanen?")
+                .setMessage("Apakah kamu yakin ingin menghapus tugas '${task.title}'? Tindakan ini tidak bisa dibatalkan.")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("Hapus") { _, _ ->
+                    taskViewModel.delete(task)
+                    Toast.makeText(context, "Tugas '${task.title}' berhasil dihapus!", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Batal", null)
+                .show()
+            true
+        }
+
+        cbDone.setOnCheckedChangeListener { _, isChecked ->
+            taskViewModel.update(task.copy(isDone = isChecked))
+        }
     }
 
     private fun showEditDialog(task: Task) {
@@ -252,7 +469,19 @@ class DashboardFragment : Fragment() {
             setPadding(50, 40, 50, 40)
         }
 
-        val editText = EditText(context).apply { setText(task.title) }
+        val editTitle = EditText(context).apply {
+            setText(task.title)
+            hint = "Judul Tugas"
+        }
+        val editSubject = EditText(context).apply {
+            setText(task.subject)
+            hint = "Mata Kuliah"
+        }
+        val editDescription = EditText(context).apply {
+            setText(task.description)
+            hint = "Deskripsi Tugas"
+        }
+
         val tvDate = TextView(context).apply {
             text = "📅 ${task.deadline}"
             setPadding(0, 20, 0, 20)
@@ -275,16 +504,26 @@ class DashboardFragment : Fragment() {
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        layout.addView(editText)
+        layout.addView(editTitle)
+        layout.addView(editSubject)
+        layout.addView(editDescription)
         layout.addView(tvDate)
 
         AlertDialog.Builder(context)
             .setTitle("Edit Tugas")
             .setView(layout)
             .setPositiveButton("Simpan") { _, _ ->
-                val newTitle = editText.text.toString().trim()
-                if (newTitle.isNotEmpty()) {
-                    taskViewModel.update(task.copy(title = newTitle, deadline = newDeadline))
+                val newTitle = editTitle.text.toString().trim()
+                val newSubject = editSubject.text.toString().trim()
+                val newDescription = editDescription.text.toString().trim()
+
+                if (newTitle.isNotEmpty() && newSubject.isNotEmpty()) {
+                    taskViewModel.update(task.copy(
+                        title = newTitle,
+                        subject = newSubject,
+                        description = newDescription,
+                        deadline = newDeadline
+                    ))
                     setTodoAlarmH30(newTitle, newDeadline)
                 }
             }
@@ -292,17 +531,15 @@ class DashboardFragment : Fragment() {
             .show()
     }
 
-    // ── 🌟 REVISI SAKTI: PROTEKSI INTEGRITAS DATA HEADER (ANTI-FORCE CLOSE) ──
     private fun setupHeader() {
         try {
             val user = Firebase.auth.currentUser
             val emailUser = user?.email
 
-            // Berikan validasi berlapis: jika email tidak null dan mengandung karakter '@'
             val username = if (!emailUser.isNullOrEmpty() && emailUser.contains("@")) {
                 emailUser.substringBefore("@")
             } else {
-                "Pengguna" // Cadangan aman jika Firebase terlambat me-render email
+                "Pengguna"
             }
 
             binding.tvGreeting.text = "Selamat belajar, $username! 👋"
@@ -316,6 +553,7 @@ class DashboardFragment : Fragment() {
             binding.tvGreeting.text = "Selamat belajar, Pengguna! 👋"
         }
     }
+
     private fun setupStreak() {
         updateStreakUI()
         binding.btnPrevMonth.setOnClickListener { currentCalendarMonth.add(Calendar.MONTH, -1); setupCalendar() }
@@ -359,7 +597,6 @@ class DashboardFragment : Fragment() {
         datePickerDialog.show()
     }
 
-    // ── 🌟 REVISI TOTAL: LOGIKA ALARM DENGAN FLAG_MUTABLE & TOAST FORENSIK ──
     private fun setTodoAlarmH30(taskTitle: String, deadlineStr: String) {
         try {
             val sdfParser = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
@@ -377,7 +614,6 @@ class DashboardFragment : Fragment() {
                 triggerTimeMs = alarmCalendar.timeInMillis - (30 * 60 * 1000)
                 Toast.makeText(requireContext(), "Alarm diset: 30 menit sebelum deadline", Toast.LENGTH_SHORT).show()
             } else if (timeDifferenceMs > 0) {
-                // Skenario Mepet: Paksa langsung bunyi 5 detik lagi untuk keperluan tes!
                 triggerTimeMs = currentTimeMs + 5000
                 Toast.makeText(requireContext(), "Jadwal mepet! Notif akan bunyi dalam 5 detik...", Toast.LENGTH_LONG).show()
             } else {
@@ -392,7 +628,6 @@ class DashboardFragment : Fragment() {
 
             val uniqueId = taskTitle.hashCode()
 
-            // 🔥 PERBAIKAN UTAMA: Gunakan FLAG_MUTABLE agar putExtra DATA TIDAK DIBUANG OMEN OLEH ANDROID OS
             val pendingIntent = PendingIntent.getBroadcast(
                 requireContext(),
                 uniqueId,
@@ -413,7 +648,8 @@ class DashboardFragment : Fragment() {
             e.printStackTrace()
             Toast.makeText(requireContext(), "Gagal memasang alarm: ${e.message}", Toast.LENGTH_SHORT).show()
         }
-    }// ── 🌟 REVISI SAKTI: PROTEKSI TOTAL RENDERING GRID KALENDER (ANTI-FORCE CLOSE) ──
+    }
+
     private fun buildCalendarGrid() {
         try {
             val grid = binding.calendarGrid
@@ -427,14 +663,12 @@ class DashboardFragment : Fragment() {
             val today = Calendar.getInstance()
             val studiedDays = streakManager.getStudiedDays()
 
-            // Atur jumlah baris secara dinamis agar GridLayout tidak memicu native crash
             grid.rowCount = ceil((offset + daysInMonth).toFloat() / 7f).toInt()
 
             for (i in 0 until (offset + daysInMonth)) {
                 val dayNumber = i - offset + 1
                 val cellView = TextView(requireContext())
 
-                // Gunakan taktik pembagian aman untuk ukuran grid HP Samsung
                 val screenWidth = resources.displayMetrics.widthPixels
                 val paddingTotal = (40.dpToPx() * 2) + 16.dpToPx()
                 val size = (screenWidth - paddingTotal) / 7
@@ -469,22 +703,10 @@ class DashboardFragment : Fragment() {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            // Jika grid error, buat aplikasi tetap hidup secara damai
         }
     }
-    private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
-    private fun setupQuickActions() {
-        binding.btnGoSchedule.setOnClickListener {
-            try {
-                androidx.navigation.fragment.NavHostFragment.findNavController(this)
-                    .navigate(com.example.edutrack.R.id.jadwalFragment)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(requireContext(), "Navigasi Jadwal Gagal: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+    private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -492,7 +714,6 @@ class DashboardFragment : Fragment() {
     }
 }
 
-// ── 🌟 REVISI SAKTI: RECEIVER MANDIRI (ANTI-MOGOK & TANPA DEPENDENCY SHAREDPREFS) ──
 class TodoAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         try {
@@ -513,9 +734,8 @@ class TodoAlarmReceiver : BroadcastReceiver() {
                 notificationManager.createNotificationChannel(channel)
             }
 
-            // Hapus pemanggilan SharedPrefs agar tidak memicu silent-crash pasca-clear data
             val builder = NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.ic_clock) // Pastikan ikon ic_clock ini ada di folder drawable-mu!
+                .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
                 .setContentTitle("⚠️ Batas Pengumpulan Tugas!")
                 .setContentText("Yuk, tugas '$taskTitle' harus segera diselesaikan sekarang! 🚀")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -524,6 +744,63 @@ class TodoAlarmReceiver : BroadcastReceiver() {
 
             notificationManager.notify(taskTitle.hashCode(), builder.build())
 
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+}
+
+// ── 🌟 FITUR BARU: BROADCAST RECEIVER KHUSUS UNTUK NOTIFIKASI PENGINGAT STREAK HARIAN ──
+class StreakReminderReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        try {
+            val sharedPrefs = context.getSharedPreferences("study_prefs", Context.MODE_PRIVATE)
+            val sdfTanggal = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val tanggalHariIni = sdfTanggal.format(Date())
+
+            // Cek data ketersediaan menit belajar hari ini dari SharedPreferences Pomodoro
+            val menitBelajarHariIni = sharedPrefs.getFloat("pomodoro_time_$tanggalHariIni", 0f)
+
+            // ⚠️ KRITIS: Notifikasi hanya akan mencuat jika hari ini pengguna BELUM belajar sama sekali
+            if (menitBelajarHariIni <= 0f) {
+                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val channelId = "edu_track_streak_channel"
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    val channel = NotificationChannel(
+                        channelId,
+                        "Pengingat Streak Belajar",
+                        NotificationManager.IMPORTANCE_HIGH
+                    ).apply {
+                        description = "Mengingatkan pengguna untuk mempertahankan streak belajar harian"
+                        enableLights(true)
+                        enableVibration(true)
+                    }
+                    notificationManager.createNotificationChannel(channel)
+                }
+
+                // Intent untuk membuka aplikasi saat notifikasi di-klik oleh pengguna
+                val openAppIntent = Intent(context, com.example.edutrack.MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                val pendingIntent = PendingIntent.getActivity(
+                    context,
+                    995,
+                    openAppIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
+                val builder = NotificationCompat.Builder(context, channelId)
+                    .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                    .setContentTitle("🔥 Jangan Biarkan Streak Belajarmu Putus!")
+                    .setContentText("Kamu belum melakukan aktivitas belajar hari ini. Yuk, buka Pomodoro 25 menit sekarang! 🎯")
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true)
+                    .setContentIntent(pendingIntent)
+                    .setDefaults(NotificationCompat.DEFAULT_ALL)
+
+                notificationManager.notify(888, builder.build())
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

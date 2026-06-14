@@ -25,6 +25,7 @@
         android:textColor="?attr/colorPrimary"
         android:textStyle="bold"
         android:layout_marginBottom="4dp"/>
+
     <EditText
         android:id="@+id/etTopikFlashcard"
         android:layout_width="match_parent"
@@ -42,6 +43,7 @@
         android:textColor="?attr/colorPrimary"
         android:textStyle="bold"
         android:layout_marginBottom="4dp"/>
+
     <EditText
         android:id="@+id/etPertanyaan"
         android:layout_width="match_parent"
@@ -59,6 +61,7 @@
         android:textColor="?attr/colorPrimary"
         android:textStyle="bold"
         android:layout_marginBottom="4dp"/>
+
     <EditText
         android:id="@+id/etJawaban"
         android:layout_width="match_parent"
@@ -75,47 +78,56 @@
         android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="#212121"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="12dp"/>
 
     <RadioGroup
         android:id="@+id/rgWarnaKartu"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="24dp">
+        android:orientation="horizontal"
+        android:layout_gravity="start"
+        android:layout_marginBottom="28dp">
 
         <RadioButton
             android:id="@+id/rbHijau"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Hijau"
-            android:textSize="14sp"
-            android:paddingStart="8dp"/>
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:button="@null"
+            android:background="@drawable/bg_color_picker_item"
+            android:backgroundTint="#10B981"
+            android:foreground="?attr/selectableItemBackgroundBorderless" android:layout_marginEnd="12dp"
+            android:checked="true"/>
 
         <RadioButton
             android:id="@+id/rbBiru"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Biru"
-            android:textSize="14sp"
-            android:paddingStart="8dp"/>
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:button="@null"
+            android:background="@drawable/bg_color_picker_item"
+            android:backgroundTint="#3B82F6"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginEnd="12dp"/>
 
         <RadioButton
             android:id="@+id/rbUngu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ungu"
-            android:textSize="14sp"
-            android:paddingStart="8dp"/>
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:button="@null"
+            android:background="@drawable/bg_color_picker_item"
+            android:backgroundTint="#8B5CF6"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginEnd="12dp"/>
 
         <RadioButton
             android:id="@+id/rbOranye"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Oranye"
-            android:textSize="14sp"
-            android:paddingStart="8dp"/>
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:button="@null"
+            android:background="@drawable/bg_color_picker_item"
+            android:backgroundTint="#F97316"
+            android:foreground="?attr/selectableItemBackgroundBorderless"/>
     </RadioGroup>
+
 
     <LinearLayout
         android:layout_width="match_parent"

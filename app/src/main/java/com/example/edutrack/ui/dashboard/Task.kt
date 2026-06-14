@@ -10,5 +10,7 @@ data class Task(
     val subject: String,
     val priority: String,
     val deadline: String,
-    val isDone: Boolean = false
+    val isDone: Boolean = false,
+    val description: String = "",
+    val category: String = "Lainnya"
 )
