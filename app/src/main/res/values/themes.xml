@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.EduTrack" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="android:windowBackground">@color/bg_main</item>
+        <item name="android:statusBarColor">@color/bg_dark</item>
+        <item name="android:navigationBarColor">@color/bg_card</item>
+    </style>
+
+    <style name="Theme.StudyApp" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/pomodoroFocus</item>
+        <item name="colorPrimaryVariant">@color/pomodoroFocusDark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/accentBlue</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:windowBackground">@color/bgLight</item>
+    </style>
+
+    <style name="StudyApp_Dialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="colorPrimary">@color/accentBlue</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+    </style>
+
+    <style name="TextAppearance.StudyApp.Title" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TextAppearance.StudyApp.ModeLabel" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:letterSpacing">0.05</item>
+    </style>
+
+    <style name="TextAppearance.StudyApp.TimerDigit" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">56sp</item>
+    </style>
+
+    <style name="TextAppearance.StudyApp.TimerSeparator" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="android:fontFamily">sans-serif-black</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">48sp</item>
+    </style>
+
+    <style name="TextAppearance.StudyApp.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/textSecondary</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <style name="TextAppearance.StudyApp.Stat" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/textPrimary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Widget.StudyApp.CircularProgress" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:indeterminate">false</item>
+        <item name="android:progressDrawable">@drawable/progress_arc</item>
+        <item name="android:max">100</item>
+    </style>
+
+</resources>

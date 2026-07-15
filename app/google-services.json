@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "819343155388",
+    "project_id": "edutrack-dac6c",
+    "storage_bucket": "edutrack-dac6c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819343155388:android:42beee0332b43fce9030b9",
+        "android_client_info": {
+          "package_name": "com.example.edutrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819343155388-a58usaa9fdm92nqp2007fso295a78jlh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.edutrack",
+            "certificate_hash": "27be6c7729e4d6c1c3ff186f2275099a446d1789"
+          }
+        },
+        {
+          "client_id": "819343155388-880ns2ssok8db8oes63sgapfupik2mqc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYYAeA8ywsBxJNolVCLyJwKOtItm5dYrE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "819343155388-880ns2ssok8db8oes63sgapfupik2mqc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

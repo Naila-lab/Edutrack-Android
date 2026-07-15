@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="160dp"
+    android:layout_margin="6dp">
+
+    <!-- FRONT -->
+    <LinearLayout android:id="@+id/layoutCardFront"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bg_flashcard_green"
+        android:padding="14dp">
+
+        <!-- Top row: topik chip + buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView android:id="@+id/tvCardTopik"
+                android:layout_width="80dp"
+                android:layout_height="24dp"
+                android:background="@drawable/bg_chip_mapel"
+                android:paddingHorizontal="8dp"
+                android:text="Topik"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+
+            <ImageButton android:id="@+id/btnCardEdit"
+                android:layout_width="28dp" android:layout_height="28dp"
+                android:background="@drawable/bg_icon_btn"
+                android:src="@drawable/ic_edit"
+                android:tint="@color/white"
+                android:contentDescription="Edit" />
+
+            <ImageButton android:id="@+id/btnCardDelete"
+                android:layout_width="28dp" android:layout_height="28dp"
+                android:background="@drawable/bg_icon_btn"
+                android:src="@drawable/ic_delete"
+                android:tint="@color/white"
+                android:contentDescription="Hapus"
+                android:layout_marginStart="4dp" />
+        </LinearLayout>
+
+        <!-- Question -->
+        <TextView android:id="@+id/tvCardFront"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Pertanyaan?"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:layout_marginTop="6dp"
+            android:maxLines="3"
+            android:ellipsize="end" />
+
+        <!-- Hint -->
+        <TextView android:id="@+id/tvCardHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KETUK UNTUK JAWABAN"
+            android:textColor="#AAFFFFFF"
+            android:textSize="9sp"
+            android:letterSpacing="0.1"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- BACK -->
+    <LinearLayout android:id="@+id/layoutCardBack"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@drawable/bg_flashcard_green_dark"
+        android:padding="14dp"
+        android:alpha="0"
+        android:rotationY="-180">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jawaban:"
+            android:textColor="#AAFFFFFF"
+            android:textSize="10sp" />
+
+        <TextView android:id="@+id/tvCardBack"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Jawaban."
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:maxLines="4"
+            android:ellipsize="end" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KETUK UNTUK SOAL"
+            android:textColor="#AAFFFFFF"
+            android:textSize="9sp"
+            android:letterSpacing="0.1"
+            android:gravity="center" />
+    </LinearLayout>
+
+</FrameLayout>

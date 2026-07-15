@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://tools.android.com/tools"
+    android:background="@color/bgLight"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_back_arrow"
+                android:contentDescription="Kembali"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:tint="@color/textPrimary"
+                android:layout_marginEnd="4dp"/>
+
+            <ImageView
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_clock"
+                app:tint="@color/textPrimary" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Pomodoro Timer"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/textPrimary"
+                android:layout_marginStart="10dp" />
+
+            <ImageButton
+                android:id="@+id/btnEditDuration"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_stats_card"
+                android:src="@drawable/ic_edit"
+                app:tint="@color/textSecondary"
+                android:contentDescription="Edit Durasi" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Materi yang dipelajari:"
+            android:textSize="13sp"
+            android:textColor="@color/textSecondary"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/etMateri"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_spinner"
+            android:paddingHorizontal="16dp"
+            android:hint="Contoh: Turunan fungsi trigonometri..."
+            android:inputType="text"
+            android:textSize="14sp"
+            android:textColor="@color/textPrimary"
+            android:textColorHint="@color/textSecondary"
+            android:layout_marginBottom="28dp" />
+
+        <FrameLayout
+            android:id="@+id/containerTimer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_timer_card"
+            android:elevation="6dp"
+            android:layout_marginBottom="20dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="32dp"
+            android:paddingHorizontal="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tvMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fokus"
+                    android:textSize="14sp"
+                    android:letterSpacing="0.1"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="#DDFFFFFF"
+                    android:layout_marginBottom="20dp" />
+
+                <FrameLayout
+                    android:layout_width="210dp"
+                    android:layout_height="210dp"
+                    android:layout_gravity="center_horizontal">
+
+                    <ProgressBar
+                        android:id="@+id/arcProgress"
+                        android:layout_width="210dp"
+                        android:layout_height="210dp"
+                        android:layout_gravity="center"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:progressDrawable="@drawable/progress_arc"
+                        android:max="100"
+                        android:progress="75" />
+
+                    <TextView
+                        android:id="@+id/tvTimerDisplay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="25:00"
+                        android:textSize="42sp"
+                        android:fontFamily="sans-serif-black"
+                        android:textColor="@color/white"
+                        android:includeFontPadding="false" />
+
+                    <TextView
+                        android:id="@+id/tvMinutes"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/tvSeconds"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginTop="28dp">
+
+                    <ImageButton
+                        android:id="@+id/btnReset"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_btn_secondary"
+                        android:src="@drawable/ic_reset"
+                        app:tint="@color/white"
+                        android:contentDescription="Reset" />
+
+                    <ImageButton
+                        android:id="@+id/btnStartPause"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:background="@drawable/bg_btn_primary"
+                        android:src="@drawable/ic_play"
+                        app:tint="@color/white"
+                        android:contentDescription="Mulai"
+                        android:layout_marginHorizontal="20dp" />
+
+                    <ImageButton
+                        android:id="@+id/btnSkip"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_btn_secondary"
+                        android:src="@drawable/ic_skip_next"
+                        app:tint="@color/white"
+                        android:contentDescription="Skip" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/bg_stats_card"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvPomodoroDone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="× 0 sesi"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/textPrimary"
+                android:gravity="center" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/divider" />
+
+            <TextView
+                android:id="@+id/tvTotalFocus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Total fokus: 0m 0s"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/textPrimary"
+                android:gravity="center" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

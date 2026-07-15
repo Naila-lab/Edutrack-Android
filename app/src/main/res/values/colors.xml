@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Brand Colors -->
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1D4ED8</color>
+    <color name="primary_light">#DBEAFE</color>
+
+    <!-- Background -->
+    <color name="bg_main">#F8FAFC</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="bg_dark">#0F172A</color>
+
+    <!-- Text -->
+    <color name="text_primary">#111827</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_hint">#9CA3AF</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Status Colors -->
+    <color name="green">#16A34A</color>
+    <color name="green_light">#DCFCE7</color>
+    <color name="orange">#EA580C</color>
+    <color name="orange_light">#FFF7ED</color>
+    <color name="red">#DC2626</color>
+    <color name="red_light">#FEF2F2</color>
+    <color name="yellow">#CA8A04</color>
+    <color name="yellow_light">#FEF9C3</color>
+    <color name="purple">#7C3AED</color>
+    <color name="purple_light">#F5F3FF</color>
+
+    <!-- Streak Calendar -->
+    <color name="streak_active">#2563EB</color>
+    <color name="streak_today">#1D4ED8</color>
+    <color name="streak_inactive">#E2E8F0</color>
+    <color name="streak_fire">#F97316</color>
+
+    <!-- Border -->
+    <color name="border">#E5E7EB</color>
+    <color name="divider">#F3F4F6</color>
+
+    <!-- Transparent -->
+    <color name="transparent">#00000000</color>
+    <color name="overlay">#99000000</color>
+
+    <!-- Background -->
+    <color name="bgLight">#F5F6FA</color>
+    <color name="bgCard">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="textPrimary">#111827</color>
+    <color name="textSecondary">#6B7280</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Pomodoro modes -->
+    <color name="pomodoroFocus">#FF8C42</color>
+    <color name="pomodoroFocusDark">#E8722E</color>
+    <color name="pomodoroShortBreak">#64B5F6</color>
+    <color name="pomodoroLongBreak">#81C784</color>
+
+
+    <!-- Flashcard gradients -->
+    <color name="cardGreenStart">#22C55E</color>
+    <color name="cardGreenEnd">#16A34A</color>
+    <color name="cardBlueStart">#3B82F6</color>
+    <color name="cardBlueEnd">#1D4ED8</color>
+    <color name="cardPurpleStart">#8B5CF6</color>
+    <color name="cardPurpleEnd">#6D28D9</color>
+    <color name="cardOrangeStart">#F59E0B</color>
+    <color name="cardOrangeEnd">#D97706</color>
+
+    <!-- Accent -->
+    <color name="accentBlue">#3B82F6</color>
+
+    <color name="brand_purple">#6C63FF</color>
+    <color name="brand_blue">#3F51B5</color>
+    <color name="brand_dark_purple">#4A148C</color>
+    <color name="light_bg">#F5F6FA</color>
+
+</resources>
+

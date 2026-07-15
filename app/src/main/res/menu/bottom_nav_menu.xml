@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dashboardFragment"
+        android:title="Dashboard"
+        android:icon="@drawable/ic_nav_dashboard" />
+
+    <item
+        android:id="@+id/jadwalFragment"
+        android:title="Jadwal"
+        android:icon="@drawable/ic_nav_jadwal" />
+
+    <item
+        android:id="@+id/pomodoroTimerActivity"
+        android:title="Pomodoro"
+        android:icon="@drawable/ic_nav_pomodoro" />
+
+    <item
+        android:id="@+id/flashcardActivity"
+        android:title="Flashcard"
+        android:icon="@drawable/ic_nav_flashcard" />
+
+</menu>

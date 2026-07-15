@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Durasi Fokus (10 - 60 menit)"
+        android:textSize="13sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/etFocusDuration"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_spinner"
+        android:paddingHorizontal="16dp"
+        android:hint="Contoh: 25"
+        android:inputType="number"
+        android:textSize="15sp"
+        android:textColor="@color/textPrimary"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Durasi Jeda Pendek (1 - 15 menit)"
+        android:textSize="13sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/etShortBreak"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_spinner"
+        android:paddingHorizontal="16dp"
+        android:hint="Contoh: 5"
+        android:inputType="number"
+        android:textSize="15sp"
+        android:textColor="@color/textPrimary"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Durasi Jeda Panjang (10 - 30 menit)"
+        android:textSize="13sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginBottom="6dp" />
+
+    <EditText
+        android:id="@+id/etLongBreak"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_spinner"
+        android:paddingHorizontal="16dp"
+        android:hint="Contoh: 15"
+        android:inputType="number"
+        android:textSize="15sp"
+        android:textColor="@color/textPrimary"
+        android:layout_marginBottom="8dp" /> </LinearLayout>

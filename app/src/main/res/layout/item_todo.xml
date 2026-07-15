@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ── 🌟 LAYOUT KARTU TUGAS MINIMALIS (TANPA IKON TOMBOL AKSI USANG) ── -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootTodoItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="10dp"
+    android:padding="14dp"
+    android:background="@drawable/bg_todo_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <!-- Baris Utama: Checkbox, Judul, Nama Matkul & Badge Kategori -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/cbTodoDone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp">
+
+            <!-- Judul Utama Tugas -->
+            <TextView
+                android:id="@+id/tvTodoText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:text="Membuat Mockup UI" />
+
+            <!-- Sub-Teks: Nama Mata Kuliah -->
+            <TextView
+                android:id="@+id/tvTodoSubject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#2563EB"
+                android:textStyle="italic"
+                android:text="Mata Kuliah: Sistem Informasi"
+                android:layout_marginTop="2dp" />
+        </LinearLayout>
+
+        <!-- Lencana Kategori Dinamis -->
+        <TextView
+            android:id="@+id/tvTodoCategoryBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PROYEK"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@android:color/holo_blue_dark"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp" />
+    </LinearLayout>
+
+    <!-- Baris Tambahan 1: Deskripsi Tugas -->
+    <TextView
+        android:id="@+id/tvTodoDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="8dp"
+        android:textSize="13sp"
+        android:textColor="#475569"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="Ini adalah deskripsi detail mengenai instruksi pengerjaan tugas..." />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#E2E8F0"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Baris Tambahan 2: Metadata (Deadline & Prioritas) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="2dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📅 "
+            android:textColor="#EF4444" />
+
+        <TextView
+            android:id="@+id/tvTodoDeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2026-06-13 23:59"
+            android:textSize="12sp"
+            android:textColor="#334155" />
+
+        <TextView
+            android:id="@+id/tvPriorityLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medium"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp" />
+    </LinearLayout>
+</LinearLayout>
